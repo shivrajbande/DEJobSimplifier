@@ -1,9 +1,11 @@
+import os
+from utils.config import get_env
 from utils.embeddings import vector_db
 from langchain_core.tools import tool
 
 from langchain_core.tools import tool
 import mysql.connector
-from utils.config import get_env
+
 
 @tool
 def execute_sql_query_tool(sql_query: str, creds: dict):

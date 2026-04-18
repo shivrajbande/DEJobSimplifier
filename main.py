@@ -7,35 +7,6 @@ from agents.orchestrator import orchestrator_agent
 
 app = FastAPI()
 
-
-
-# inputs = {
-#     "messages": [HumanMessage(content="Give me a plan to find the highest spending customers")]
-# }
-
-# for event iapiAPP.stream(inputs):
-#     for value in event.values():
-#         print("Agent Output:", value["messages"][-1].content)
-
-
-
-# for event in app.stream(inputs):
-#     # 'node_name' would be "retriever" or "execute_tools"
-#     for node_name, state_update in event.items():
-        
-#         # Grab the latest message from this specific node's update
-#         last_msg = state_update["messages"][-1]
-        
-#         if node_name == "retriever":
-#             if last_msg.tool_calls:
-#                 print(f"--- 🔍 Retriever is searching the Vector DB... ---")
-#             else:
-#                 print(f"--- ✅ Plan Generated: ---\n{last_msg.content}")
-                
-#         elif node_name == "execute_tools":
-#             print(f"--- 🛠️ Tool Execution complete. Results found. ---")
-
-
 def response_generator():
     try:
         # 1. Initialize input
@@ -55,7 +26,7 @@ def response_generator():
                 last_msg = state_update["messages"][-1]
                 
                 # Logic for specific nodes
-                if node_name == "retriever":
+                if node_name == "retriever_node":
                     if hasattr(last_msg, 'tool_calls') and last_msg.tool_calls:
                         print("--- 🔍 Retriever is searching the Vector DB... ---")
                     else:
@@ -63,10 +34,29 @@ def response_generator():
                         # Don't return yet! The graph might need to move to the next node.
                         final_response = last_msg.content
                 
-                elif node_name == "execute_tools":
+                elif node_name == "tools":
                     print("--- 🛠️ Tool Execution complete. Results found. ---")
                     final_response = last_msg.content
-
+                elif node_name == "sql_generator_node":
+                    if hasattr(last_msg,'tool_calls') and last_msg.tool_calls:
+                        print("--- 🔍 Retriever is searching the Vector DB... ---")
+                    else:
+                        print(f"sql generated {last_msg.content}")
+                        final_response = last_msg.content
+                if node_name == "insights_generator_node":
+                    print(f"sql generated {last_msg.content}")
+                    # This is the final step, grab the insights!
+                    raw_insights = state_update.get("final_insights")
+    
+                    # 2. Check if it's that list format you just showed me
+                    if isinstance(raw_insights, list) and len(raw_insights) > 0:
+                        # Extract the 'text' field from the first dictionary
+                        final_response = raw_insights[0].get("text")
+                    else:
+                        # Otherwise, assume it's a standard string
+                        final_response = raw_insights
+                    print("--- ✨ Insights Generated ---")
+                        
         # 3. Return the final content after the graph finishes execution
         if final_response:
             return {"response": final_response}

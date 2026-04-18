@@ -2,6 +2,7 @@ from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from agents.sql_generator.prompt import system_prompt
 from agents.common_tool import db_config_tool
 from langchain_core.messages import HumanMessage
+from agents.sql_generator.tools import execute_sql_query_tool
 
 def sql_generator_agent(llm):
     '''
@@ -12,7 +13,7 @@ def sql_generator_agent(llm):
         4. if max retry count is reached then return the error message
     '''
     # 1. Bind the tools to the llm.
-    llm_with_tools = llm.bind_tools([db_config_tool])
+    llm_with_tools = llm.bind_tools([db_config_tool,execute_sql_query_tool])
 
     # 2. Create a prompt for the classifier agent.
     prompt = ChatPromptTemplate.from_messages([
@@ -67,6 +68,7 @@ def sql_generator_agent(llm):
                 sql_results = content.split("<SQL_RESULTS>")[1].split("</SQL_RESULTS>")[0].strip()
                 
                 update['generated_sql'] = sql_query
+                update['sql_results']=sql_results
                 # We don't need to update sql_error here as it's a success
             except IndexError:
                 # Fallback for poorly formatted tags
