@@ -20,9 +20,9 @@ def scheme_retriever_agent(llm):
 
     # 3. Create a classofoer agent(node) using the prompt and llm_with_tools.
     def node(state):
-        context = [state['messages'][0]] + state['messages'][-2:]
+        messages = state['messages']
         chain = prompt | llm_with_tools
-        response = chain.invoke({'messages': context})
+        response = chain.invoke({'messages': messages})
         
         # 1. Default update: always track the latest message
         update = {'messages': [response]}

@@ -19,9 +19,9 @@ def sql_generator_conditions(state) -> Literal["tools", "retry", "fail", "succes
 def route_after_tools(state):
     # If we already have the schema, don't go back to the retriever!
     # Go straight to the SQL Generator to attempt the fix.
-    if state.get("relevant_schema") and state.get("user_requirement"):
+    if any(call['name'] == 'execute_sql_query_tool' for call in state['messages'][-2].tool_calls):
         return "sql_generator_node"
-    
+        
     return "retriever_node"
 
 def htil_router(state):
@@ -50,3 +50,4 @@ def retriever_router(state):
     # 3. Fallback: if it didn't call a tool and didn't provide tags, 
     # the 'node' added a HumanMessage, so we loop back to retriever_node to try again.
     return "retriever_node"
+    

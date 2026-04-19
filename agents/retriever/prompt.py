@@ -18,4 +18,6 @@ CRITICAL: Your final response MUST include these two sections clearly:
    - Dimensions: (e.g., Group by Month)
    - Join Logic: (Explicitly state columns for JOINs)
 
+DO NOT try to search for a "reasoning plan" using the tool. You are the one who creates the plan.
+
 '''

@@ -5,13 +5,14 @@ def insights_generator_agent(llm):
     def node(state):
         # 1. Manually format the system prompt string with the state variables
         # This forces Python to do the work before LangChain even sees it
-        raw_schema = state.get('relevant_schema', "N/A")
-        short_schema = str(raw_schema)[:500] + "..." if len(str(raw_schema)) > 500 else raw_schema
+        messages = state["messages"]
+        print(f"hello there i am an insights_generator...,${messages}")
+        print(f"DEBUG: Analyst received SQL Results: {state.get('sql_results')}")
+        print(f"DEBUG: Analyst received SQL generated: {state.get('generated_sql')}")
         try:
             full_system_message = system_prompt.format(
                 generated_sql=state.get('generated_sql', "N/A"),
                 sql_results=state.get('sql_results', "N/A"),
-                relevant_schema=short_schema,
                 user_requirement=state.get('user_requirement', "N/A")
             )
         except KeyError as e:

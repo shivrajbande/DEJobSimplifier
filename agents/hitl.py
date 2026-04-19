@@ -24,7 +24,8 @@ def hitl_agent(llm):
         # 3. Return the messages and clear the error for the next potential run
         return {
             "messages": [response],
-            "sql_error": response.content 
+            "sql_error": response.content,
+            "final_insights":[response]
         }
 
     return node

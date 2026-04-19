@@ -61,27 +61,29 @@ workflow.add_node("hitl_node",hitl_agent(sql_llm))
 workflow.add_node("insights_generator_node",insights_generator_agent(insights_llm))
 
 # Define edges between the nodes
-workflow.add_edge(START,"retriever_node")
-workflow.add_conditional_edges("retriever_node", retriever_router, # Standard LangGraph tool check
-    {
-        "tools": "tools",
-        "retriever_node": "retriever_node",
-        "__end__": "sql_generator_node" # If no tools called, go to SQL Gen
-    })
+# 1. Clear out the start
+workflow.add_edge(START, "retriever_node")
+
+# 2. Retriever logic (Decides to go to Tools or SQL Gen)
+workflow.add_conditional_edges("retriever_node", retriever_router, {
+    "tools": "tools",
+    "retriever_node": "retriever_node",
+    "__end__": "sql_generator_node"
+})
+
+# 3. SQL Generator logic (Decides to go to Tools or Success)
+workflow.add_conditional_edges("sql_generator_node", sql_generator_conditions, {
+    "tools": "tools",
+    "retry": "sql_generator_node",
+    "fail": "hitl_node",
+    "success": "insights_generator_node" # Path to the finish line
+})
+
+# 4. Tools always go back to the node that called them (Logic must be in your tools router)
 workflow.add_conditional_edges("tools", route_after_tools)
-workflow.add_conditional_edges("sql_generator_node",sql_generator_conditions,{
-    "tools":"tools",
-    "retry":"sql_generator_node",
-    "fail":"hitl_node",
-    "success":"insights_generator_node"
-})
 
-workflow.add_conditional_edges("hitl_node",htil_router,{
-    "continue":"sql_generator_node",
-    "end":END
-})
-
-workflow.add_edge("insights_generator_node",END)
+# 5. THE FINISH LINE (Only one way out)
+workflow.add_edge("insights_generator_node", END)
 
 
 #compile the workflow to actually run

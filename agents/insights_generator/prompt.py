@@ -7,7 +7,6 @@ Structure your response exactly as follows:
    - State the final answer to the user's question clearly in one sentence based on the following results: {sql_results}
 
 2. Technical Traceability:
-   - Tables Used: {relevant_schema}
    - Key Columns and Logic: Based on the requirements: {user_requirement}
    - Logic: [Explain the JOIN logic and filters applied in this specific query]
 
