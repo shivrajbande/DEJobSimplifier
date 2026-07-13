@@ -15,3 +15,65 @@ AIMessage(
     ],
     response_metadata={'finish_reason': 'tool_calls', ...}
 )
+
+
+
+Task,Recommended Model,Provider
+Image Extraction,Gemini 1.5 Flash,Google AI Studio
+Intent Routing,Gemini 1.5 Flash,Google AI Studio
+SQL Generation,Llama 3.3 70B,Groq
+Data Concepts/Info,Llama 3.3 70B,Groq
+Final Insights,Llama 3.1 8B,Groq
+
+
+
+
+status:
+- requires_clarification
+- requires_selection
+- approval_required
+- upload_required
+- retry_required
+- authentication_required
+
+
+
+User Input
+   ↓
+Deterministic Router
+   ↓
+
+IF image:
+    Document Analyzer
+        ↓
+    HITL Clarification Loop (if needed)
+        ↓
+    Structured Extraction
+
+        ↓
+    Intent Classifier
+        ↓
+    Supervisor
+        ↓
+    Execution Agents
+
+IF only query:
+    Intent Classifier directly
+
+
+
+[intent_classifier_node]
+           │
+           ▼
+┌──────────────────┐
+│  sql_generator   │◄──────────────────────┐ (Loop back on error)
+└──────────┬───────┘                       │
+           │                               │
+           ▼                               │
+┌──────────────────┐                       │
+│  sql_validator   ├─ [Invalid Query] ─────┘
+└──────────┬───────┘
+           │ [Valid SELECT]        [Valid VIEW/MVIEW Creation]
+           ├───> (execute_sql_tool) ───────┐
+           │                               ▼
+           └───────────────────────► [insights_generator]

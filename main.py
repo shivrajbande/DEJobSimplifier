@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from langchain_core.messages import HumanMessage
 from agents.orchestrator import orchestrator_agent
+from typing import Optional
 import json
 from pydantic import BaseModel
 
@@ -12,13 +13,19 @@ from pydantic import BaseModel
 
 app = FastAPI()
 
+import uuid
+
 class QueryRequest(BaseModel):
     query: str
+    image: Optional[str] = None
+    session_id: Optional[str] = None
+
+    
 
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # ⚠️ for dev only
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -30,85 +37,102 @@ app.add_middleware(
 async def response_generator(targetId: str, request: QueryRequest):
 
     user_query = request.query
+    image_url = request.image
+    session_id = request.session_id or targetId or str(uuid.uuid4())
+
+    session_config={"configurable":{"thread_id":session_id}}
+    
 
     async def event_stream():
         try:
-            inputs = {"messages": [HumanMessage(content=user_query)]}
+            inputs = {
+                "messages": [HumanMessage(content=user_query)],
+                "raw_user_query": user_query,
+                "uploaded_image": image_url,
+            }
 
-            for event in orchestrator_agent.stream(inputs, stream_mode="updates"):
+            for event in orchestrator_agent.stream(inputs,config=session_config,stream_mode="updates"):
                 print(f"DEBUG: Current Node -> {list(event.keys())}")
                 for node_name, state_update in event.items():
-
-                    if "messages" not in state_update:
-                        continue
-
-                    last_msg = state_update["messages"][-1]
 
                     # -------------------------
                     # 🧠 STATUS STREAMING
                     # -------------------------
-                    if node_name == "retriever_node":
-                        if hasattr(last_msg, "tool_calls") and last_msg.tool_calls:
-                            yield f"data: {json.dumps({
-                                'type': 'status',
-                                'node': node_name,
-                                'message': '🔍 Searching knowledge base...'
-                            })}\n\n"
-                        else:
-                            yield f"data: {json.dumps({
-                                'type': 'status',
-                                'node': node_name,
-                                'message': '📋 Plan generated'
-                            })}\n\n"
-
-                    elif node_name == "tools":
+                    if node_name == "SUPERVISOUR_NODE":
                         yield f"data: {json.dumps({
                             'type': 'status',
                             'node': node_name,
-                            'message': '🛠️ Executing tools...'
+                            'message': '📋 Triaging user query...'
                         })}\n\n"
 
-                    elif node_name == "sql_generator_node":
-                        if hasattr(last_msg, "tool_calls") and last_msg.tool_calls:
+                    elif node_name == "DOCUMENT_ANALYZER_NODE":
+                        yield f"data: {json.dumps({
+                            'type': 'status',
+                            'node': node_name,
+                            'message': '📄 Analyzing uploaded document/image...'
+                        })}\n\n"
+
+                    elif node_name == "INTENT_CLASSIFIER_NODE":
+                        yield f"data: {json.dumps({
+                            'type': 'status',
+                            'node': node_name,
+                            'message': '🔍 Classifying intent and loading database schemas...'
+                        })}\n\n"
+
+                    elif node_name == "SQL_GENERATOR_NODE":
+                        yield f"data: {json.dumps({
+                            'type': 'status',
+                            'node': node_name,
+                            'message': '✍️ Generating SQL query...'
+                        })}\n\n"
+
+                    elif node_name == "SQL_VALIDATOR_NODE":
+                        exec_state = state_update.get("execution", {})
+                        sql_error = exec_state.get("sql_error") if isinstance(exec_state, dict) else None
+                        if sql_error:
                             yield f"data: {json.dumps({
                                 'type': 'status',
                                 'node': node_name,
-                                'message': 'Generating SQL...'
+                                'message': f'❌ SQL validation failed: {sql_error}'
                             })}\n\n"
                         else:
-                            raw_insights = state_update.get("final_insights")
+                            yield f"data: {json.dumps({
+                                'type': 'status',
+                                'node': node_name,
+                                'message': '🛡️ SQL validation successful'
+                            })}\n\n"
 
-                            if len(raw_insights) > 0:
-                                if(isinstance(raw_insights, list)):
-                                    content = raw_insights[0].get("text", "")
-                                    yield f"data: {json.dumps({
-                                        'type': 'status',
-                                        'node': node_name,
-                                        'message': 'SQL error is {content}'
-                                    })}\n\n"
+                    elif node_name == "HITL_NODE":
+                        yield f"data: {json.dumps({
+                            'type': 'status',
+                            'node': node_name,
+                            'message': '⚠️ Awaiting human clarification or approval...'
+                        })}\n\n"
 
-                                else:
-                                    content = raw_insights or ""
-                                    yield f"data: {json.dumps({
-                                        'type': 'status',
-                                        'node': node_name,
-                                        'message': 'SQL error is {content}'
-                                    })}\n\n"
-
-                          
-                            else:
-                                yield f"data: {json.dumps({
-                                    'type': 'status',
-                                    'node': node_name,
-                                    'message': '✅ SQL ready'
-                                })}\n\n"
-
+                    elif node_name == "__interrupt__":
+                        interrupt_info = state_update[0] if isinstance(state_update, (list, tuple)) else state_update
+                        value = getattr(interrupt_info, "value", interrupt_info)
+                        yield f"data: {json.dumps({
+                            'type': 'interrupt',
+                            'node': node_name,
+                            'message': '⚠️ Action required: Clarification or input needed.',
+                            'details': value
+                        })}\n\n"
+ 
                     # -------------------------
                     # ✨ FINAL OUTPUT STREAM
                     # -------------------------
-                    elif node_name == "insights_generator_node":
+                    elif node_name == "INSIGHTS_GENERATOR_NODE":
+                        yield f"data: {json.dumps({
+                            'type': 'status',
+                            'node': node_name,
+                            'message': '✨ Compiling final insights...'
+                        })}\n\n"
 
-                        raw_insights = state_update.get("final_insights")
+                        exec_state = state_update.get("execution", {})
+                        raw_insights = exec_state.get("generated_insights") if isinstance(exec_state, dict) else None
+                        if not raw_insights:
+                            raw_insights = state_update.get("final_insights")
 
                         if isinstance(raw_insights, list) and len(raw_insights) > 0:
                             content = raw_insights[0].get("text", "")

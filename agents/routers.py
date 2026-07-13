@@ -1,40 +1,56 @@
+from agents.state import AgentState
 from typing import Literal
-def sql_generator_conditions(state) -> Literal["tools", "retry", "fail", "success"]:
-    last_msg = state['messages'][-1]
 
-    # 1. If the AI wants to use a tool (db_config or execute_sql)
-    if hasattr(last_msg, "tool_calls") and last_msg.tool_calls:
-        return "tools"
-    
-    # 2. Check for Database Errors
-    if "DB_ERROR" in last_msg.content or "MYSQL_ERROR" in last_msg.content:
-        # We only check the count here; we don't increment it here
-        if state.get('retry_count', 0) < 3:
-            return "retry"
-        else:
-            return "fail"
-            
-    return "success"
-
-def route_after_tools(state):
-    # If we already have the schema, don't go back to the retriever!
-    # Go straight to the SQL Generator to attempt the fix.
-    if any(call['name'] == 'execute_sql_query_tool' for call in state['messages'][-2].tool_calls):
+def intent_router(state):
+    workflow_state = state.get("workflow",{})
+   
+    next_step = workflow_state.get("next_step","")
+    if next_step in ("SQL_GENERATOR", "SQL_GENERATOR_NODE"):
         return "sql_generator_node"
-        
-    return "retriever_node"
+    elif next_step in ("INSIGHTS_GENERATOR", "INSIGHTS_GENERATOR_NODE"):
+        return "insights_generator_node"
+    elif next_step in ("HITL", "HITL_NODE"):
+        return "hitl_node"
+    elif next_step in ("INTENT_CLASSIFIER", "INTENT_CLASSIFIER_NODE"):
+        return "intent_classifier_node"
 
-def htil_router(state):
-    """
-    Called after 3 failed retries.
-    Returns 'continue' to retry or 'end' to stop.
-    """
-    user_input = state['messages'][-1].content.lower()
-    if "continue" in user_input:
-        return "continue"
+def router_after_validation(state):
+    workflow_state = state.get("workflow",{})
+    
+    next_step = workflow_state.get("next_step","")
+    if next_step in ("SQL_GENERATOR", "SQL_GENERATOR_NODE"):
+        return "sql_generator_node"
+    elif next_step in ("INSIGHTS_GENERATOR", "INSIGHTS_GENERATOR_NODE"):
+        return "insights_generator_node"
+    elif next_step in ("HITL", "HITL_NODE"):
+        return "hitl_node"
+
+def supervisor_router(state):
+    workflow_state = state.get("workflow", {})
+    next_step = workflow_state.get("next_step", "")
+    if next_step == "DOCUMENT_ANALYZER_NODE":
+        return "document_analyzer_node"
     else:
-        return "end"
+        return "intent_classifier_node"
 
+def hitl_router(state):
+    """
+    Evaluates the user's human-in-the-loop decision and dynamically routes 
+    the graph back to the calling node, or cleanly terminates.
+    """
+    # 1. Look at what the user said (adapting to your message structure)
+    user_input = state['messages'][-1].content.lower()
+    
+    # 2. Extract the return destination breadcrumb safely
+    workflow_state = state.get("workflow", {})
+    return_destination = workflow_state.get("return_to", "supervisor_node")
+
+    # 3. Route based on their intent
+    if "continue" in user_input or "yes" in user_input:
+        # Dynamically returns the node identifier they came from!
+        return return_destination 
+    else:
+        return "END"
 
 def retriever_router(state):
     last_message = state["messages"][-1]

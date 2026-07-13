@@ -1,91 +1,130 @@
-from typing import TypedDict, Literal
+from typing import Optional, TypedDict, Literal, List, Dict, Any, Annotated
 from langgraph.graph import StateGraph, START, END, add_messages
 from IPython.display import Image, display
 from langchain.chat_models import init_chat_model
-from langchain_core.tools import tool
-from typing_extensions import Annotated
-from langgraph.prebuilt import ToolNode, tools_condition
+from langgraph.prebuilt import ToolNode
 import os
-from langgraph.checkpoint.memory import MemorySaver
-from typing import List
-from agents.retriever.logic import scheme_retriever_agent
-from agents.sql_generator.logic import sql_generator_agent
-from agents.retriever.tools import semantic_search_tool
-from agents.sql_generator.tools import execute_sql_query_tool
-from agents.common_tool import db_config_tool
-from agents.routers import sql_generator_conditions,htil_router,route_after_tools,retriever_router
-from agents.hitl import hitl_agent
-from agents.insights_generator.logic import insights_generator_agent
+import sqlite3
+from langgraph.checkpoint.sqlite import SqliteSaver
 
 
+# Import custom nodes
+from agents.main_agent.logic import supervisor_agent
+from agents.intent_classification.document_analyser.logic import document_classifier
+from agents.intent_classification.intent_classifier.logic import Intent_classifier
+from agents.execution_agents.sql_generator.logic import sql_generator_agent
+from agents.execution_agents.sql_generator.prompt import system_prompt as sql_system_prompt
 
-class AgentState(TypedDict):
-    # 'add_messages' means this list only grows, it never gets erased
-    messages: Annotated[List, add_messages]
-    
-    # These strings will be REPLACED every time a node returns them
-    user_requirement: str
-    relevant_schema: str
-    generated_sql: str
-    sql_results : str
-    
-    is_valid: bool
-    sql_error: str
-    retry_count: int  # You'll increment this in your nodes: state['retry_count'] + 1
-    
-    final_insights: str
+from agents.execution_agents.sql_generator.sql_validator import sql_validator_node
+from agents.execution_agents.insights_generator.logic import insights_generator_agent
+from agents.hitl import hitl_classifier_node
+
+# Import prompts
+from agents.intent_classification.intent_classifier.prompt import final_intent
+
+# Import custom conditional router handlers
+from agents.routers import supervisor_router, intent_router, router_after_validation, hitl_router
+
+# =====================================================================
+# 1. HIERARCHICAL STATE SCHEMAS (Synced with new architecture)
+# =====================================================================
+
+from agents.state import AgentState, ClarificationState, DocumentState, WorkflowState, ExecutionState
 
 
+# =====================================================================
+# 2. LLM CONNECTIONS (Groq Configuration)
+# =====================================================================
 
-# llm = init_chat_model('llama-3.1-8b-instant', model_provider='groq')
+triage_llm = init_chat_model('llama-3.1-8b-instant', model_provider='groq', temperature=0.1)
+vision_llm = init_chat_model('meta-llama/llama-4-scout-17b-16e-instruct', model_provider='groq', temperature=0.1)
+sql_llm = init_chat_model("llama-3.3-70b-versatile", model_provider="groq", temperature=0)
+insights_llm = init_chat_model('llama-3.3-70b-versatile', model_provider='groq', temperature=0.5)
 
-schema_llm = init_chat_model('llama-3.1-8b-instant', model_provider='groq',temperature=0.1)
-
-# 2. The Specialist: SQL Code Generation
-# DeepSeek-R1 Distill is excellent at code reasoning
-sql_llm = init_chat_model("llama-3.3-70b-versatile",model_provider="groq",temperature=0)
-
-# 3. The Analyst: Insights & Summarization
-# Llama 3.3 70B has the best creative/analytical writing
-insights_llm = init_chat_model('llama-3.3-70b-versatile', model_provider='groq',temperature=0.5)
+# =====================================================================
+# 3. GRAPH INITIALIZATION & NODE REGISTRATION
+# =====================================================================
 
 workflow = StateGraph(AgentState)
-tools = ToolNode([semantic_search_tool,db_config_tool,execute_sql_query_tool])
+
+# Phase 1: Intake & Discovery Nodes (Registered UPPERCASE)
+workflow.add_node("SUPERVISOUR_NODE", supervisor_agent(llm=triage_llm))
+workflow.add_node("DOCUMENT_ANALYZER_NODE", document_classifier(vision_llm))
+workflow.add_node("INTENT_CLASSIFIER_NODE", Intent_classifier(triage_llm, final_intent))
+
+# Phase 2: Generation, Validation & Analytical Blueprint Nodes
+workflow.add_node("SQL_GENERATOR_NODE", sql_generator_agent(sql_llm, sql_system_prompt))
+workflow.add_node("SQL_VALIDATOR_NODE", sql_validator_node)
+workflow.add_node("INSIGHTS_GENERATOR_NODE", insights_generator_agent(insights_llm))
+
+# Phase 3: Centralized Human-in-the-Loop Interruption Loop
+workflow.add_node("HITL_NODE", hitl_classifier_node())
+
+# =====================================================================
+# 4. DETERMINISTIC & CONDITIONAL ROUTING EDGES
+# =====================================================================
+
+# 1. Entry Point -> Routes to UPPERCASE Supervisor node configuration
+workflow.add_edge(START, "SUPERVISOUR_NODE")
+
+workflow.add_conditional_edges(
+    "SUPERVISOUR_NODE",
+    supervisor_router,
+    {
+        "document_analyzer_node": "DOCUMENT_ANALYZER_NODE",
+        "intent_classifier_node": "INTENT_CLASSIFIER_NODE"
+    }
+)
 
 
-# Graph nodes
-workflow.add_node("tools",tools)
-workflow.add_node("retriever_node",scheme_retriever_agent(schema_llm))
-workflow.add_node("sql_generator_node",sql_generator_agent(sql_llm))
-workflow.add_node("hitl_node",hitl_agent(sql_llm))
-workflow.add_node("insights_generator_node",insights_generator_agent(insights_llm))
 
-# Define edges between the nodes
-# 1. Clear out the start
-workflow.add_edge(START, "retriever_node")
+# 3. Document Analysis -> Drops sequentially into uppercase Intent Layer
+workflow.add_edge("DOCUMENT_ANALYZER_NODE", "INTENT_CLASSIFIER_NODE")
 
-# 2. Retriever logic (Decides to go to Tools or SQL Gen)
-workflow.add_conditional_edges("retriever_node", retriever_router, {
-    "tools": "tools",
-    "retriever_node": "retriever_node",
-    "__end__": "sql_generator_node"
-})
+# 4. Intent Router -> Corrected mapping points to match structural node bindings
+workflow.add_conditional_edges(
+    "INTENT_CLASSIFIER_NODE", 
+    intent_router, 
+    {
+        "sql_generator_node": "SQL_GENERATOR_NODE",
+        "insights_generator_node": "INSIGHTS_GENERATOR_NODE", 
+        "hitl_node": "HITL_NODE",
+        "intent_classifier_node": "INTENT_CLASSIFIER_NODE"
+    }
+)
 
-# 3. SQL Generator logic (Decides to go to Tools or Success)
-workflow.add_conditional_edges("sql_generator_node", sql_generator_conditions, {
-    "tools": "tools",
-    "retry": "sql_generator_node",
-    "fail": "hitl_node",
-    "success": "insights_generator_node" # Path to the finish line
-})
+# 5. Code Engine -> Drops directly into programmatic validation block
+workflow.add_edge("SQL_GENERATOR_NODE", "SQL_VALIDATOR_NODE")
 
-# 4. Tools always go back to the node that called them (Logic must be in your tools router)
-workflow.add_conditional_edges("tools", route_after_tools)
+# 6. SQL Validator -> Fixed target mappings to match state machine requirements
+workflow.add_conditional_edges(
+    "SQL_VALIDATOR_NODE", 
+    router_after_validation, 
+    {
+        "sql_generator_node": "SQL_GENERATOR_NODE",         
+        "insights_generator_node": "INSIGHTS_GENERATOR_NODE", 
+        "hitl_node": "HITL_NODE"                             
+    }
+)
 
-# 5. THE FINISH LINE (Only one way out)
-workflow.add_edge("insights_generator_node", END)
+# 7. Human Loop Correction Router -> Re-entry target strings synchronized with upper cases
+workflow.add_conditional_edges(
+    "HITL_NODE", 
+    hitl_router, 
+    {
+        "supervisor_node": "SUPERVISOUR_NODE",     
+        "sql_generator_node": "SQL_GENERATOR_NODE", 
+        "END": "__end__"
+    }
+)
 
+# 8. Terminal Paths
+workflow.add_edge("INSIGHTS_GENERATOR_NODE", END)
 
-#compile the workflow to actually run
-orchestrator_agent = workflow.compile()
+# =====================================================================
+# 5. COMPILE ENGINE
+# =====================================================================
+conn = sqlite3.connect("state_db.sqlite", check_same_thread=False)
+memory = SqliteSaver(conn)
 
+orchestrator_agent = workflow.compile(checkpointer=memory)
