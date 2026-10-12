@@ -1,0 +1,1802 @@
+[
+  {
+    "question_id": 58,
+    "db_id": "california_schools",
+    "question": "What is the phone number and extension number for the school with the zip code 95203-3704? Indicate the school's name.",
+    "gold_sql": "SELECT Phone, Ext, School FROM schools WHERE Zip = '95203-3704'",
+    "extraction": {
+      "select": [
+        {
+          "text": "phone number"
+        },
+        {
+          "text": "extension number"
+        },
+        {
+          "text": "school's name"
+        }
+      ],
+      "metrics": [],
+      "group_by": [],
+      "filters": [
+        {
+          "text": "zip code 95203-3704",
+          "operator": "=",
+          "value": "95203-3704",
+          "column_hint": "zip code",
+          "negated": false
+        }
+      ],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": null,
+    "seconds": 1.38
+  },
+  {
+    "question_id": 10,
+    "db_id": "california_schools",
+    "question": "For the school with the highest average score in Reading in the SAT test, what is its FRPM count for students aged 5-17?",
+    "gold_sql": "SELECT T2.`FRPM Count (Ages 5-17)` FROM satscores AS T1 INNER JOIN frpm AS T2 ON T1.cds = T2.CDSCode ORDER BY T1.AvgScrRead DESC LIMIT 1",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 42,
+    "db_id": "california_schools",
+    "question": "What is the type of education offered in the school who scored the highest average in Math?",
+    "gold_sql": "SELECT T2.EdOpsName FROM satscores AS T1 INNER JOIN schools AS T2 ON T1.cds = T2.CDSCode ORDER BY T1.AvgScrMath DESC LIMIT 1",
+    "extraction": {
+      "select": [
+        {
+          "text": "type of education"
+        }
+      ],
+      "metrics": [
+        {
+          "text": "average in Math"
+        }
+      ],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": "avg"
+    },
+    "error": null,
+    "seconds": 0.88
+  },
+  {
+    "question_id": 1,
+    "db_id": "california_schools",
+    "question": "Please list the lowest three eligible free rates for students aged 5-17 in continuation schools.",
+    "gold_sql": "SELECT `Free Meal Count (Ages 5-17)` / `Enrollment (Ages 5-17)` FROM frpm WHERE `Educational Option Type` = 'Continuation School' AND `Free Meal Count (Ages 5-17)` / `Enrollment (Ages 5-17)` IS NOT NULL ORDER BY `Free Meal Count (Ages 5-17)` / `Enrollment (Ages 5-17)` ASC LIMIT 3",
+    "extraction": {
+      "select": [
+        {
+          "text": "eligible free rates"
+        }
+      ],
+      "metrics": [],
+      "group_by": [],
+      "filters": [
+        {
+          "text": "students aged 5-17",
+          "operator": "between",
+          "value": [
+            "5",
+            "17"
+          ],
+          "column_hint": "age",
+          "negated": false
+        },
+        {
+          "text": "in continuation schools",
+          "operator": "=",
+          "value": "continuation schools",
+          "column_hint": "school type",
+          "negated": false
+        }
+      ],
+      "time": [],
+      "order_limit": [
+        {
+          "text": "lowest three"
+        }
+      ],
+      "aggregation_hint": null
+    },
+    "error": null,
+    "seconds": 1.76
+  },
+  {
+    "question_id": 71,
+    "db_id": "california_schools",
+    "question": "What is the district code for the School that does not offer a magnet program in the city of Fresno?",
+    "gold_sql": "SELECT T1.`District Code` FROM frpm AS T1 INNER JOIN schools AS T2 ON T1.CDSCode = T2.CDSCode WHERE T2.City = 'Fresno' AND T2.Magnet = 0",
+    "extraction": {
+      "select": [
+        {
+          "text": "district code"
+        }
+      ],
+      "metrics": [],
+      "group_by": [],
+      "filters": [
+        {
+          "text": "in the city of Fresno",
+          "operator": "=",
+          "value": "Fresno",
+          "column_hint": "city",
+          "negated": false
+        }
+      ],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": null,
+    "seconds": 3.12
+  },
+  {
+    "question_id": 66,
+    "db_id": "california_schools",
+    "question": "Between 1/1/2000 to 12/31/2005, how many directly funded schools opened in the county of Stanislaus?",
+    "gold_sql": "SELECT COUNT(School) FROM schools WHERE strftime('%Y', OpenDate) BETWEEN '2000' AND '2005' AND County = 'Stanislaus' AND FundingType = 'Directly funded'",
+    "extraction": {
+      "select": [],
+      "metrics": [
+        {
+          "text": "directly funded schools"
+        }
+      ],
+      "group_by": [],
+      "filters": [
+        {
+          "text": "county of Stanislaus",
+          "operator": "=",
+          "value": "Stanislaus",
+          "column_hint": "county",
+          "negated": false
+        }
+      ],
+      "time": [
+        {
+          "text": "Between 1/1/2000 to 12/31/2005"
+        }
+      ],
+      "order_limit": [],
+      "aggregation_hint": "count"
+    },
+    "error": null,
+    "seconds": 19.42
+  },
+  {
+    "question_id": 15,
+    "db_id": "california_schools",
+    "question": "Which active district has the highest average score in Reading?",
+    "gold_sql": "SELECT T1.District FROM schools AS T1 INNER JOIN satscores AS T2 ON T1.CDSCode = T2.cds WHERE T1.StatusType = 'Active' ORDER BY T2.AvgScrRead DESC LIMIT 1",
+    "extraction": {
+      "select": [
+        {
+          "text": "district"
+        }
+      ],
+      "metrics": [
+        {
+          "text": "average score"
+        }
+      ],
+      "group_by": [],
+      "filters": [
+        {
+          "text": "active",
+          "operator": "=",
+          "value": "active",
+          "column_hint": null,
+          "negated": false
+        }
+      ],
+      "time": [],
+      "order_limit": [
+        {
+          "text": "highest"
+        }
+      ],
+      "aggregation_hint": "avg"
+    },
+    "error": null,
+    "seconds": 19.76
+  },
+  {
+    "question_id": 26,
+    "db_id": "california_schools",
+    "question": "State the names and full communication address of high schools in Monterey which has more than 800 free or reduced price meals for ages 15-17?",
+    "gold_sql": "SELECT T1.`School Name`, T2.Street, T2.City, T2.State, T2.Zip FROM frpm AS T1 INNER JOIN schools AS T2 ON T1.CDSCode = T2.CDSCode WHERE T2.County = 'Monterey' AND T1.`Free Meal Count (Ages 5-17)` > 800 AND T1.`School Type` = 'High Schools (Public)'",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 40,
+    "db_id": "california_schools",
+    "question": "What is the telephone number for the school with the lowest average score in reading in Fresno Unified?",
+    "gold_sql": "SELECT T2.Phone FROM satscores AS T1 INNER JOIN schools AS T2 ON T1.cds = T2.CDSCode WHERE T2.District = 'Fresno Unified' AND T1.AvgScrRead IS NOT NULL ORDER BY T1.AvgScrRead ASC LIMIT 1",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 32,
+    "db_id": "california_schools",
+    "question": "What is the eligible free or reduced price meal rate for the top 5 schools in grades 1-12 with the highest free or reduced price meal count of the schools with the ownership code 66?",
+    "gold_sql": "SELECT CAST(T1.`FRPM Count (K-12)` AS REAL) / T1.`Enrollment (K-12)` FROM frpm AS T1 INNER JOIN schools AS T2 ON T1.CDSCode = T2.CDSCode WHERE T2.SOC = 66 ORDER BY T1.`FRPM Count (K-12)` DESC LIMIT 5",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 45,
+    "db_id": "california_schools",
+    "question": "What is the average writing score of each of the schools managed by Ricci Ulrich? List the schools and the corresponding average writing scores.",
+    "gold_sql": "SELECT T2.School, T1.AvgScrWrite FROM satscores AS T1 INNER JOIN schools AS T2 ON T1.cds = T2.CDSCode WHERE T2.AdmFName1 = 'Ricci' AND T2.AdmLName1 = 'Ulrich'",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 47,
+    "db_id": "california_schools",
+    "question": "What is the monthly average number of schools that opened in Alameda County under the jurisdiction of the Elementary School District in 1980?",
+    "gold_sql": "SELECT CAST(COUNT(School) AS REAL) / 12 FROM schools WHERE DOC = 52 AND County = 'Alameda' AND strftime('%Y', OpenDate) = '1980'",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 67,
+    "db_id": "california_schools",
+    "question": "What is the total amount of Community College District closure in 1989 in the city of San Francisco?",
+    "gold_sql": "SELECT COUNT(School) FROM schools WHERE strftime('%Y', ClosedDate) = '1989' AND City = 'San Francisco' AND DOCType = 'Community College District'",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 19,
+    "db_id": "california_schools",
+    "question": "What is the phone number of the school that has the highest average score in Math?",
+    "gold_sql": "SELECT T1.Phone FROM schools AS T1 INNER JOIN satscores AS T2 ON T1.CDSCode = T2.cds ORDER BY T2.AvgScrMath DESC LIMIT 1",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 59,
+    "db_id": "california_schools",
+    "question": "What is the website for the schools under the administrations of Mike Larson and Dante Alvarez?",
+    "gold_sql": "SELECT Website FROM schools WHERE (AdmFName1 = 'Mike' AND AdmLName1 = 'Larson') OR (AdmFName1 = 'Dante' AND AdmLName1 = 'Alvarez')",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 55,
+    "db_id": "california_schools",
+    "question": "Of the schools with a mailing state address in California, what is the ratio of the schools located in the county of Colusa against the school located in the county of Humboldt?",
+    "gold_sql": "SELECT CAST(SUM(CASE WHEN County = 'Colusa' THEN 1 ELSE 0 END) AS REAL) / SUM(CASE WHEN County = 'Humboldt' THEN 1 ELSE 0 END) FROM schools WHERE MailState = 'CA'",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 62,
+    "db_id": "california_schools",
+    "question": "What is the total number of non-chartered schools in the county of Los Angeles with a percent (%) of eligible free meals for grades 1 through 12 that is less than 0.18%?",
+    "gold_sql": "SELECT COUNT(T2.School) FROM frpm AS T1 INNER JOIN schools AS T2 ON T1.CDSCode = T2.CDSCode WHERE T2.County = 'Los Angeles' AND T2.Charter = 0 AND CAST(T1.`Free Meal Count (K-12)` AS REAL) * 100 / T1.`Enrollment (K-12)` < 0.18",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 80,
+    "db_id": "california_schools",
+    "question": "What is the school type of the school with the highest latitude? Indicate the name of the school as well as the latitude coordinates.",
+    "gold_sql": "SELECT T1.`School Type`, T1.`School Name`, T2.Latitude FROM frpm AS T1 INNER JOIN schools AS T2 ON T1.CDSCode = T2.CDSCode ORDER BY T2.Latitude DESC LIMIT 1",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 51,
+    "db_id": "california_schools",
+    "question": "In which mailing street address can you find the school that has the lowest average score in reading? Also give the school's name.",
+    "gold_sql": "SELECT T2.MailStreet, T2.School FROM satscores AS T1 INNER JOIN schools AS T2 ON T1.cds = T2.CDSCode WHERE T1.AvgScrRead IS NOT NULL ORDER BY T1.AvgScrRead ASC LIMIT 1",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 56,
+    "db_id": "california_schools",
+    "question": "Of all the schools with a mailing state address in California, how many are active in San Joaquin city?",
+    "gold_sql": "SELECT COUNT(CDSCode) FROM schools WHERE City = 'San Joaquin' AND MailState = 'CA' AND StatusType = 'Active'",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 49,
+    "db_id": "california_schools",
+    "question": "Which different county has the most number of closed schools? Please provide the name of each school as well as the closure date.",
+    "gold_sql": "SELECT DISTINCT County, School, ClosedDate FROM schools WHERE County = ( SELECT County FROM schools WHERE StatusType = 'Closed' GROUP BY County ORDER BY COUNT(School) DESC LIMIT 1 ) AND StatusType = 'Closed' AND school IS NOT NULL",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 84,
+    "db_id": "california_schools",
+    "question": "What are the two most common first names among the school administrators? Indicate the district to which they administer.",
+    "gold_sql": "SELECT DISTINCT T1.AdmFName1, T1.District FROM schools AS T1 INNER JOIN ( SELECT admfname1 FROM schools GROUP BY admfname1 ORDER BY COUNT(admfname1) DESC LIMIT 2 ) AS T2 ON T1.AdmFName1 = T2.admfname1",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 74,
+    "db_id": "california_schools",
+    "question": "What is the lowest grade for the District Special Education Consortia School with National Center for Educational Statistics school district identification number of 0613360?",
+    "gold_sql": "SELECT MIN(T1.`Low Grade`) FROM frpm AS T1 INNER JOIN schools AS T2 ON T1.CDSCode = T2.CDSCode WHERE T2.NCESDist = '0613360' AND T2.EdOpsCode = 'SPECON'",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 63,
+    "db_id": "california_schools",
+    "question": "In chartered schools with charter number 00D2, what are the names of all the administrators? Include the name of the school and the city to which it belongs",
+    "gold_sql": "SELECT AdmFName1, AdmLName1, School, City FROM schools WHERE Charter = 1 AND CharterNum = '00D2'",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 33,
+    "db_id": "california_schools",
+    "question": "If there are any, what are the websites address of the schools with a free meal count of 1,900-2,000 to students aged 5-17? Include the name of the school.",
+    "gold_sql": "SELECT T2.Website, T1.`School Name` FROM frpm AS T1 INNER JOIN schools AS T2 ON T1.CDSCode = T2.CDSCode WHERE T1.`Free Meal Count (Ages 5-17)` BETWEEN 1900 AND 2000 AND T2.Website IS NOT NULL",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 125,
+    "db_id": "financial",
+    "question": "For loans contracts which are still running where client are in debt, list the district of the and the state the percentage unemployment rate increment from year 1995 to 1996.",
+    "gold_sql": "SELECT CAST((T3.A13 - T3.A12) AS REAL) * 100 / T3.A12 FROM loan AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id INNER JOIN district AS T3 ON T2.district_id = T3.district_id WHERE T1.status = 'D'",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 102,
+    "db_id": "financial",
+    "question": "State different accounts who have account opening date before 1997 and own an amount of money greater than 3000USD",
+    "gold_sql": "SELECT DISTINCT T2.account_id FROM trans AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id WHERE STRFTIME('%Y', T2.date) < '1997' AND T1.amount > 3000",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 146,
+    "db_id": "financial",
+    "question": "Who are the female account holders who own credit cards and also have loans?",
+    "gold_sql": "SELECT T1.client_id FROM client AS T1 INNER JOIN disp AS T2 ON T1.client_id = T2.client_id INNER JOIN account AS T5 ON T2.account_id = T5.account_id INNER JOIN loan AS T3 ON T5.account_id = T3.account_id INNER JOIN card AS T4 ON T2.disp_id = T4.disp_id WHERE T1.gender = 'F'",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 169,
+    "db_id": "financial",
+    "question": "What was the growth rate of the total amount of loans across all accounts for a male client between 1996 and 1997?",
+    "gold_sql": "SELECT CAST((SUM(CASE WHEN STRFTIME('%Y', T1.date) = '1997' THEN T1.amount ELSE 0 END) - SUM(CASE WHEN STRFTIME('%Y', T1.date) = '1996' THEN T1.amount ELSE 0 END)) AS REAL) * 100 / SUM(CASE WHEN STRFTIME('%Y', T1.date) = '1996' THEN T1.amount ELSE 0 END) FROM loan AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id INNER JOIN disp AS T3 ON T3.account_id = T2.account_id INNER JOIN client AS T4 ON T4.client_id = T3.client_id WHERE T4.gender = 'M' AND T3.type = 'OWNER'",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 150,
+    "db_id": "financial",
+    "question": "How many accounts in North Bohemia has made a transaction with the partner's bank being AB?",
+    "gold_sql": "SELECT COUNT(T2.account_id) FROM district AS T1 INNER JOIN account AS T2 ON T1.district_id = T2.district_id INNER JOIN trans AS T3 ON T2.account_id = T3.account_id WHERE T3.bank = 'AB' AND T1.A3 = 'north Bohemia'",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 94,
+    "db_id": "financial",
+    "question": "List out the account numbers of female clients who are oldest and has lowest average salary, calculate the gap between this lowest average salary with the highest average salary?",
+    "gold_sql": "SELECT T1.account_id , ( SELECT MAX(A11) - MIN(A11) FROM district ) FROM account AS T1 INNER JOIN district AS T2 ON T1.district_id = T2.district_id INNER JOIN disp AS T3 ON T1.account_id = T3.account_id INNER JOIN client AS T4 ON T3.client_id = T4.client_id WHERE T2.district_id = ( SELECT district_id FROM client WHERE gender = 'F' ORDER BY birth_date ASC LIMIT 1 ) ORDER BY T2.A11 DESC LIMIT 1",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 153,
+    "db_id": "financial",
+    "question": "How many 'classic' cards are eligible for loan?",
+    "gold_sql": "SELECT COUNT(T1.card_id) FROM card AS T1 INNER JOIN disp AS T2 ON T1.disp_id = T2.disp_id WHERE T1.type = 'classic' AND T2.type = 'OWNER'",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 119,
+    "db_id": "financial",
+    "question": "For accounts in 1993 with statement issued after transaction, list the account ID, district name and district region.",
+    "gold_sql": "SELECT T1.account_id, T2.A2, T2.A3 FROM account AS T1 INNER JOIN district AS T2 ON T1.district_id = T2.district_id WHERE T1.frequency = 'POPLATEK PO OBRATU' AND STRFTIME('%Y', T1.date)= '1993'",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 141,
+    "db_id": "financial",
+    "question": "Which districts have transactions greater than USS$10,000 in 1997?",
+    "gold_sql": "SELECT T1.district_id FROM account AS T1 INNER JOIN district AS T2 ON T1.district_id = T2.district_id INNER JOIN trans AS T3 ON T1.account_id = T3.account_id WHERE STRFTIME('%Y', T3.date) = '1997' GROUP BY T1.district_id HAVING SUM(T3.amount) > 10000",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 132,
+    "db_id": "financial",
+    "question": "What is the average loan amount by male borrowers?",
+    "gold_sql": "SELECT AVG(T4.amount) FROM client AS T1 INNER JOIN disp AS T2 ON T1.client_id = T2.client_id INNER JOIN account AS T3 ON T2.account_id = T3.account_id INNER JOIN loan AS T4 ON T3.account_id = T4.account_id WHERE T1.gender = 'M'",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 149,
+    "db_id": "financial",
+    "question": "Please list the account types that are not eligible for loans, and the average income of residents in the district where the account is located exceeds $8000 but is no more than $9000.",
+    "gold_sql": "SELECT T3.type FROM district AS T1 INNER JOIN account AS T2 ON T1.district_id = T2.district_id INNER JOIN disp AS T3 ON T2.account_id = T3.account_id WHERE T3.type != 'OWNER' AND T1.A11 BETWEEN 8000 AND 9000",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 168,
+    "db_id": "financial",
+    "question": "What percentage of clients who opened their accounts in the district with an average salary of over 10000 are women?",
+    "gold_sql": "SELECT CAST(SUM(T2.gender = 'F') AS REAL) * 100 / COUNT(T2.client_id) FROM district AS T1 INNER JOIN client AS T2 ON T1.district_id = T2.district_id WHERE T1.A11 > 10000",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 159,
+    "db_id": "financial",
+    "question": "List all the withdrawals in cash transactions that the client with the id 3356 makes.",
+    "gold_sql": "SELECT T4.trans_id FROM client AS T1 INNER JOIN disp AS T2 ON T1.client_id = T2.client_id INNER JOIN account AS T3 ON T2.account_id = T3.account_id INNER JOIN trans AS T4 ON T3.account_id = T4.account_id WHERE T1.client_id = 3356 AND T4.operation = 'VYBER'",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 111,
+    "db_id": "financial",
+    "question": "How many accounts were opened in Litomerice in 1996?",
+    "gold_sql": "SELECT COUNT(T2.account_id) FROM district AS T1 INNER JOIN account AS T2 ON T1.district_id = T2.district_id WHERE STRFTIME('%Y', T2.date) = '1996' AND T1.A2 = 'Litomerice'",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 126,
+    "db_id": "financial",
+    "question": "Calculate the percentage of account from 'Decin' district for all accounts are opened in 1993.",
+    "gold_sql": "SELECT CAST(SUM(T1.A2 = 'Decin') AS REAL) * 100 / COUNT(account_id) FROM district AS T1 INNER JOIN account AS T2 ON T1.district_id = T2.district_id WHERE STRFTIME('%Y', T2.date) = '1993'",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 183,
+    "db_id": "financial",
+    "question": "How many accounts in Beroun were opened after 1996?",
+    "gold_sql": "SELECT COUNT(account_id) FROM account AS T1 INNER JOIN district AS T2 ON T1.district_id = T2.district_id WHERE STRFTIME('%Y', T1.date) > '1996' AND T2.A2 = 'Beroun'",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 93,
+    "db_id": "financial",
+    "question": "How many male customers who are living in North Bohemia have average salary greater than 8000?",
+    "gold_sql": "SELECT COUNT(T1.client_id) FROM client AS T1 INNER JOIN district AS T2 ON T1.district_id = T2.district_id WHERE T1.gender = 'M' AND T2.A3 = 'north Bohemia' AND T2.A11 > 8000",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 133,
+    "db_id": "financial",
+    "question": "In 1996, which districts have the highest unemployment rate? List their branch location and district name.",
+    "gold_sql": "SELECT district_id, A2 FROM district ORDER BY A13 DESC LIMIT 1",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 104,
+    "db_id": "financial",
+    "question": "The transaction of 840 USD happened in 1998/10/14, when was this account opened?",
+    "gold_sql": "SELECT T1.date FROM account AS T1 INNER JOIN trans AS T2 ON T1.account_id = T2.account_id WHERE T2.amount = 840 AND T2.date = '1998-10-14'",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 124,
+    "db_id": "financial",
+    "question": "List the loan ID, district and average salary for loan with duration of 60 months.",
+    "gold_sql": "SELECT T3.loan_id, T2.A2, T2.A11 FROM account AS T1 INNER JOIN district AS T2 ON T1.district_id = T2.district_id INNER JOIN loan AS T3 ON T1.account_id = T3.account_id WHERE T3.duration = 60",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 91,
+    "db_id": "financial",
+    "question": "The average unemployment ratio of 1995 and 1996, which one has higher percentage?",
+    "gold_sql": "SELECT DISTINCT IIF(AVG(A13) > AVG(A12), '1996', '1995') FROM district",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 182,
+    "db_id": "financial",
+    "question": "How many male customers who were born between 1974 and 1976 have made a payment on their home in excess of $4000?",
+    "gold_sql": "SELECT COUNT(T1.account_id) FROM trans AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id INNER JOIN disp AS T4 ON T2.account_id = T4.account_id INNER JOIN client AS T3 ON T4.client_id = T3.client_id WHERE STRFTIME('%Y', T3.birth_date) BETWEEN '1974' AND '1976' AND T3.gender = 'M' AND T1.amount > 4000 AND T1.k_symbol = 'SIPO'",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 113,
+    "db_id": "financial",
+    "question": "For the client who applied 98832 USD loan in 1996/1/3, when was his/her birthday?",
+    "gold_sql": "SELECT T4.birth_date FROM loan AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id INNER JOIN disp AS T3 ON T2.account_id = T3.account_id INNER JOIN client AS T4 ON T3.client_id = T4.client_id WHERE T1.date = '1996-01-03' AND T1.amount = 98832",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 131,
+    "db_id": "financial",
+    "question": "Which district has highest active loan?",
+    "gold_sql": "SELECT T2.A3 FROM account AS T1 INNER JOIN district AS T2 ON T1.district_id = T2.district_id INNER JOIN loan AS T3 ON T1.account_id = T3.account_id WHERE T3.status IN ('C', 'D') GROUP BY T2.A3 ORDER BY SUM(T3.amount) DESC LIMIT 1",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 156,
+    "db_id": "financial",
+    "question": "Who is the owner of the account with the largest loan amount?",
+    "gold_sql": "SELECT T1.client_id FROM disp AS T1 INNER JOIN account AS T3 ON T1.account_id = T3.account_id INNER JOIN loan AS T2 ON T3.account_id = T2.account_id WHERE T1.type = 'OWNER' ORDER BY T2.amount DESC LIMIT 1",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 660,
+    "db_id": "codebase_community",
+    "question": "What is the owner user id of the most valuable post?",
+    "gold_sql": "SELECT OwnerUserId FROM posts WHERE FavoriteCount = ( SELECT MAX(FavoriteCount) FROM posts )",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 613,
+    "db_id": "codebase_community",
+    "question": "List out the dates that users who are located in Rochester, NY obtained their badges?",
+    "gold_sql": "SELECT T2.Date FROM users AS T1 INNER JOIN badges AS T2 ON T1.Id = T2.UserId WHERE T1.Location = 'Rochester, NY'",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 631,
+    "db_id": "codebase_community",
+    "question": "How many posts were created by Daniel Vassallo?",
+    "gold_sql": "SELECT COUNT(T1.Id) FROM users AS T1 INNER JOIN postHistory AS T2 ON T1.Id = T2.UserId WHERE T1.DisplayName = 'Daniel Vassallo'",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 565,
+    "db_id": "codebase_community",
+    "question": "User No.23853 gave a comment to a post at 9:08:18 on 2013/7/12, was that post well-finished?",
+    "gold_sql": "SELECT IIF(T2.ClosedDate IS NULL, 'NOT well-finished', 'well-finished') AS resylt FROM comments AS T1 INNER JOIN posts AS T2 ON T1.PostId = T2.Id WHERE T1.UserId = 23853 AND T1.CreationDate = '2013-07-12 09:08:18.0'",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 690,
+    "db_id": "codebase_community",
+    "question": "Identify the latest badge awarded to the user with the display name Emmett.",
+    "gold_sql": "SELECT T1.Name FROM badges AS T1 INNER JOIN users AS T2 ON T1.UserId = T2.Id WHERE T2.DisplayName = 'Emmett' ORDER BY T1.Date DESC LIMIT 1",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 711,
+    "db_id": "codebase_community",
+    "question": "Among products comments with 0 score, what is the total number of users ages 40 years old?",
+    "gold_sql": "SELECT COUNT(DISTINCT T1.id) FROM comments AS T1 INNER JOIN users AS T2 ON T1.UserId = T2.Id WHERE T1.Score = 0 AND T2.Age = 40",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 694,
+    "db_id": "codebase_community",
+    "question": "Provide the text of the latest 10 comments to the post with the title 'Analysing wind data with R' and the display name of the user who left it.",
+    "gold_sql": "SELECT T3.Text, T1.DisplayName FROM users AS T1 INNER JOIN posts AS T2 ON T1.Id = T2.OwnerUserId INNER JOIN comments AS T3 ON T2.Id = T3.PostId WHERE T2.Title = 'Analysing wind data with R' ORDER BY T1.CreationDate DESC LIMIT 10",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 648,
+    "db_id": "codebase_community",
+    "question": "Provide the users' display names and available website URLs of the post with favorite count of more than 150.",
+    "gold_sql": "SELECT T1.DisplayName, T1.WebsiteUrl FROM users AS T1 INNER JOIN posts AS T2 ON T1.Id = T2.OwnerUserId WHERE T2.FavoriteCount > 150",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 563,
+    "db_id": "codebase_community",
+    "question": "User No.3025 gave a comment at 20:29:39 on 2014/4/23 to a post, how many favorite counts did that post get?",
+    "gold_sql": "SELECT T1.FavoriteCount FROM posts AS T1 INNER JOIN comments AS T2 ON T1.Id = T2.PostId WHERE T2.CreationDate = '2014-04-23 20:29:39.0' AND T2.UserId = 3025",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 574,
+    "db_id": "codebase_community",
+    "question": "Which user has the website URL listed at 'http://stackoverflow.com'",
+    "gold_sql": "SELECT DisplayName FROM users WHERE WebsiteUrl = 'http://stackoverflow.com'",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 575,
+    "db_id": "codebase_community",
+    "question": "What is the badge name that user 'SilentGhost' obtained?",
+    "gold_sql": "SELECT T2.Name FROM users AS T1 INNER JOIN badges AS T2 ON T1.Id = T2.UserId WHERE T1.DisplayName = 'SilentGhost'",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 716,
+    "db_id": "codebase_community",
+    "question": "Among the comments with scores between 5 to 10, what is the percentage of the users with 0 up votes?",
+    "gold_sql": "SELECT CAST(SUM(IIF(T1.UpVotes = 0, 1, 0)) AS REAL) * 100/ COUNT(T1.Id) AS per FROM users AS T1 INNER JOIN comments AS T2 ON T1.Id = T2.UserId WHERE T2.Score BETWEEN 5 AND 10",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 597,
+    "db_id": "codebase_community",
+    "question": "How many users from India have the teacher badges?",
+    "gold_sql": "SELECT COUNT(T1.Id) FROM badges AS T1 INNER JOIN users AS T2 ON T1.UserId = T2.Id WHERE T2.Location = 'India' AND T1.Name = 'Teacher'",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 616,
+    "db_id": "codebase_community",
+    "question": "What is the comment's rating score of the post which was created on 7/19/2010 7:19:56 PM",
+    "gold_sql": "SELECT T1.Score FROM comments AS T1 INNER JOIN posts AS T2 ON T1.PostId = T2.Id WHERE T1.CreationDate = '2010-07-19 19:19:56.0'",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 553,
+    "db_id": "codebase_community",
+    "question": "Among the badges obtained by csgillespie, how many of them were obtained in the year 2011?",
+    "gold_sql": "SELECT COUNT(T1.Id) FROM badges AS T1 INNER JOIN users AS T2 ON T1.UserId = T2.Id WHERE STRFTIME('%Y', T1.Date) = '2011' AND T2.DisplayName = 'csgillespie'",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 534,
+    "db_id": "codebase_community",
+    "question": "What is the display name of the user who has the most number of views?",
+    "gold_sql": "SELECT DisplayName FROM users WHERE Views = ( SELECT MAX(Views) FROM users )",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 607,
+    "db_id": "codebase_community",
+    "question": "How many positive comments are there on the list?",
+    "gold_sql": "SELECT COUNT(id) FROM comments WHERE score > 60",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 624,
+    "db_id": "codebase_community",
+    "question": "What is the name of user with the ID of 30?",
+    "gold_sql": "SELECT DisplayName FROM users WHERE Id = 30",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 666,
+    "db_id": "codebase_community",
+    "question": "Among the posts that were voted by user 1465, what is the id of the most valuable post?",
+    "gold_sql": "SELECT T2.Id FROM votes AS T1 INNER JOIN posts AS T2 ON T1.PostId = T2.Id WHERE T1.UserId = 1465 ORDER BY T2.FavoriteCount DESC LIMIT 1",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 611,
+    "db_id": "codebase_community",
+    "question": "Mention the reputation of users who had obtained the badge on 7/19/2010 7:39:08 PM.",
+    "gold_sql": "SELECT T1.Reputation FROM users AS T1 INNER JOIN badges AS T2 ON T1.Id = T2.UserId WHERE T2.Date = '2010-07-19 19:39:08.0'",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 618,
+    "db_id": "codebase_community",
+    "question": "List out the age of users who located in Vienna, Austria obtained the badge?",
+    "gold_sql": "SELECT T1.Age FROM users AS T1 INNER JOIN badges AS T2 ON T1.Id = T2.UserId WHERE T1.Location = 'Vienna, Austria'",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 697,
+    "db_id": "codebase_community",
+    "question": "What is the reputation and view count of the user, who is known by his or her display name 'Jarrod Dixon'?",
+    "gold_sql": "SELECT Reputation, Views FROM users WHERE DisplayName = 'Jarrod Dixon'",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 545,
+    "db_id": "codebase_community",
+    "question": "Among the posts owned by csgillespie, how many of them are root posts?",
+    "gold_sql": "SELECT COUNT(T1.Id) FROM posts AS T1 INNER JOIN users AS T2 ON T1.OwnerUserId = T2.Id WHERE T2.DisplayName = 'csgillespie' AND T1.ParentId IS NULL",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 626,
+    "db_id": "codebase_community",
+    "question": "How many votes were made in 2010?",
+    "gold_sql": "SELECT COUNT(id) FROM votes WHERE STRFTIME('%Y', CreationDate) = '2010'",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 654,
+    "db_id": "codebase_community",
+    "question": "Mention the display name and location of the user who owned the excerpt post with hypothesis-testing tag.",
+    "gold_sql": "SELECT T3.DisplayName, T3.Location FROM tags AS T1 INNER JOIN posts AS T2 ON T1.ExcerptPostId = T2.Id INNER JOIN users AS T3 ON T3.Id = T2.OwnerUserId WHERE T1.TagName = 'hypothesis-testing'",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 1221,
+    "db_id": "thrombosis_prediction",
+    "question": "Provide the ID, sex, birthday of all patients diagnosed with 'RA' that are within the UN normal index.",
+    "gold_sql": "SELECT DISTINCT T1.ID, T1.SEX, T1.Birthday FROM Patient AS T1 INNER JOIN Laboratory AS T2 ON T1.ID = T2.ID WHERE T2.UN < 30 AND T1.Diagnosis = 'RA'",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 1311,
+    "db_id": "thrombosis_prediction",
+    "question": "How many patients with severe thrombosis have a normal prothrombin time?",
+    "gold_sql": "SELECT COUNT(T1.ID) FROM Patient AS T1 INNER JOIN Laboratory AS T2 ON T1.ID = T2.ID INNER JOIN Examination AS T3 ON T1.ID = T3.ID WHERE T2.PT < 14 AND T3.Thrombosis < 3 AND T3.Thrombosis > 0",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 1203,
+    "db_id": "thrombosis_prediction",
+    "question": "How many patients who were female got white blood cells that were below 3.5?",
+    "gold_sql": "SELECT COUNT(T1.ID) FROM Patient AS T1 INNER JOIN Laboratory AS T2 ON T1.ID = T2.ID WHERE T2.WBC < 3.5 AND T1.SEX = 'F'",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 1199,
+    "db_id": "thrombosis_prediction",
+    "question": "How many patients who underwent testing in 1997 had protein levels outside the normal range?",
+    "gold_sql": "SELECT COUNT(ID) FROM Laboratory WHERE (ALB <= 6.0 OR ALB >= 8.5) AND STRFTIME('%Y', Date) = '1997'",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 1150,
+    "db_id": "thrombosis_prediction",
+    "question": "What is the percentage of female patient were born after 1930?",
+    "gold_sql": "SELECT CAST(SUM(CASE WHEN STRFTIME('%Y', Birthday) > '1930' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(*) FROM Patient WHERE SEX = 'F'",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 1281,
+    "db_id": "thrombosis_prediction",
+    "question": "Among the patients who have an abnormal level of glutamic oxaloacetic transaminase, when was the youngest of them born?",
+    "gold_sql": "SELECT T1.Birthday FROM Patient AS T1 INNER JOIN Laboratory AS T2 ON T1.ID = T2.ID WHERE T2.GOT >= 60 ORDER BY T1.Birthday DESC LIMIT 1",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 1245,
+    "db_id": "thrombosis_prediction",
+    "question": "For the examinations done after 1997/1/1, how many of them have the result of an inactivated partial prothrom bin time?",
+    "gold_sql": "SELECT COUNT(T1.ID) FROM Patient AS T1 INNER JOIN Laboratory AS T2 ON T1.ID = T2.ID WHERE T2.Date > '1997-01-01' AND T2.APTT >= 45",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 1229,
+    "db_id": "thrombosis_prediction",
+    "question": "For all patients with triglyceride (TG) level beyond the normal range, how many are age more than 50 years?",
+    "gold_sql": "SELECT COUNT(DISTINCT T1.ID) FROM Patient AS T1 INNER JOIN Laboratory AS T2 ON T1.ID = T2.ID WHERE T2.TG >= 200 AND STRFTIME('%Y', CURRENT_TIMESTAMP) - STRFTIME('%Y', T1.Birthday) > 50",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 1211,
+    "db_id": "thrombosis_prediction",
+    "question": "Provide the ID and age of patient with lactate dehydrogenase (LDH) between 100-300 index above the normal range.",
+    "gold_sql": "SELECT DISTINCT T1.ID, STRFTIME('%Y', CURRENT_TIMESTAMP) - STRFTIME('%Y', T1.Birthday) FROM Patient AS T1 INNER JOIN Laboratory AS T2 ON T1.ID = T2.ID WHERE T2.LDH > 600 AND T2.LDH < 800",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 1305,
+    "db_id": "thrombosis_prediction",
+    "question": "How many patients accepted to the hospital have a normal level of white blood cells?",
+    "gold_sql": "SELECT COUNT(T1.ID) FROM Patient AS T1 INNER JOIN Laboratory AS T2 ON T1.ID = T2.ID WHERE T2.WBC BETWEEN 3.5 AND 9 AND T1.Admission = '+'",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 1304,
+    "db_id": "thrombosis_prediction",
+    "question": "Among the patients with a normal blood glucose, how many of them don't have thrombosis?",
+    "gold_sql": "SELECT COUNT(T1.ID) FROM Patient AS T1 INNER JOIN Laboratory AS T2 ON T1.ID = T2.ID INNER JOIN Examination AS T3 ON T1.ID = T3.ID WHERE T2.GLU < 180 AND T3.Thrombosis = 0",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 1164,
+    "db_id": "thrombosis_prediction",
+    "question": "How many of the patients with the most serious thrombosis cases examined in 1997 are women?",
+    "gold_sql": "SELECT  COUNT(*) FROM Patient AS T1 INNER JOIN Examination AS T2 ON T1.ID = T2.ID WHERE T1.SEX = 'F' AND STRFTIME('%Y', T2.`Examination Date`) = '1997' AND T2.Thrombosis = 1",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 1236,
+    "db_id": "thrombosis_prediction",
+    "question": "For all the female patient age 50 and above, who has abnormal red blood cell count. State if they were admitted to hospital.",
+    "gold_sql": "SELECT DISTINCT T1.ID, T1.Admission FROM Patient AS T1 INNER JOIN Laboratory AS T2 ON T1.ID = T2.ID WHERE T1.SEX = 'F' AND (T2.RBC <= 3.5 OR T2.RBC >= 6.0) AND STRFTIME('%Y', CURRENT_TIMESTAMP) - STRFTIME('%Y', T1.Birthday) >= 50",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 1222,
+    "db_id": "thrombosis_prediction",
+    "question": "How many male patients are are with creatinine index out of the normal range?",
+    "gold_sql": "SELECT COUNT(T1.ID) FROM Patient AS T1 INNER JOIN Laboratory AS T2 ON T1.ID = T2.ID WHERE T2.CRE >= 1.5 AND T1.SEX = 'M'",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 1237,
+    "db_id": "thrombosis_prediction",
+    "question": "Among all outpatients, list out those have low hemoglobin level. State the different IDs and their sex.",
+    "gold_sql": "SELECT DISTINCT T1.ID, T1.SEX FROM Patient AS T1 INNER JOIN Laboratory AS T2 ON T1.ID = T2.ID WHERE T2.HGB < 10 AND T1.Admission = '-'",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 1208,
+    "db_id": "thrombosis_prediction",
+    "question": "Provide IDs for male patients with ALT glutamic pylvic transaminase (GPT) that have history of ALT glutamic pylvic transaminase (GPT) exceed the normal range.",
+    "gold_sql": "SELECT DISTINCT T1.ID FROM Patient AS T1 INNER JOIN Laboratory AS T2 ON T1.ID = T2.ID WHERE T1.SEX = 'M' AND T2.GPT >= 60",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 1225,
+    "db_id": "thrombosis_prediction",
+    "question": "List and group all patients by sex for total bilirubin (T-BIL) level not within the normal range.",
+    "gold_sql": "SELECT T1.ID,T1.SEX FROM Patient AS T1 INNER JOIN Laboratory AS T2 ON T1.ID = T2.ID WHERE T2.`T-BIL` >= 2.0 GROUP BY T1.SEX,T1.ID",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 1266,
+    "db_id": "thrombosis_prediction",
+    "question": "Which is the youngest patient with an abnormal anti-ribonuclear protein level? Please list his or her date of birth.",
+    "gold_sql": "SELECT T1.Birthday FROM Patient AS T1 INNER JOIN Laboratory AS T2 ON T1.ID = T2.ID WHERE T2.RNP != '-' OR '+-' ORDER BY T1.Birthday DESC LIMIT 1",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 1280,
+    "db_id": "thrombosis_prediction",
+    "question": "How many male patients have their glutamic oxaloacetic transaminase in the normal range?",
+    "gold_sql": "SELECT COUNT(T1.ID) FROM Patient AS T1 INNER JOIN Laboratory AS T2 ON T1.ID = T2.ID WHERE T2.GOT < 60 AND T1.SEX = 'M'",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 1289,
+    "db_id": "thrombosis_prediction",
+    "question": "For the patients who are diagnosed with SJS, how many of them have a normal level of total protein?",
+    "gold_sql": "SELECT COUNT(T1.ID) FROM Patient AS T1 INNER JOIN Laboratory AS T2 ON T1.ID = T2.ID WHERE T1.Diagnosis = 'SJS' AND T2.TP > 6.0 AND T2.TP < 8.5",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 1250,
+    "db_id": "thrombosis_prediction",
+    "question": "Which patient has a normal proteinuria level and is diagnosed with SLE? Please give his or her patient ID.",
+    "gold_sql": "SELECT DISTINCT T1.ID FROM Patient AS T1 INNER JOIN Laboratory AS T2 ON T1.ID = T2.ID WHERE T2.`U-PRO` > 0 AND T2.`U-PRO` < 30 AND T1.Diagnosis = 'SLE'",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 1270,
+    "db_id": "thrombosis_prediction",
+    "question": "Among the patients who has a normal anti-scl70, how many of them are female and does not have any symptom?",
+    "gold_sql": "SELECT COUNT(DISTINCT T1.ID) FROM Patient AS T1 INNER JOIN Laboratory AS T2 ON T1.ID = T2.ID INNER JOIN Examination AS T3 ON T3.ID = T2.ID WHERE (T2.SC170 = 'negative' OR T2.SC170 = '0') AND T1.SEX = 'F' AND T3.Symptoms IS NULL",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 1154,
+    "db_id": "thrombosis_prediction",
+    "question": "State the sex and birthday of patient ID '163109'. When was the examination taken and what symptom does the patient had.",
+    "gold_sql": "SELECT T1.SEX, T1.Birthday, T2.`Examination Date`, T2.Symptoms FROM Patient AS T1 INNER JOIN Examination AS T2 ON T1.ID = T2.ID WHERE T1.ID = 163109",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 1226,
+    "db_id": "thrombosis_prediction",
+    "question": "Who is the oldest patient with the highest total cholesterol (T-CHO). State the patient ID and T-CHO index.",
+    "gold_sql": "SELECT T1.ID, T2.`T-CHO` FROM Patient AS T1 INNER JOIN Laboratory AS T2 ON T1.ID = T2.ID ORDER BY T2.`T-CHO` DESC, T1.Birthday ASC LIMIT 1",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  },
+  {
+    "question_id": 1198,
+    "db_id": "thrombosis_prediction",
+    "question": "How many female patients were given an APS diagnosis?",
+    "gold_sql": "SELECT COUNT(ID) FROM Patient WHERE SEX = 'F' AND Diagnosis = 'APS'",
+    "extraction": {
+      "select": [],
+      "metrics": [],
+      "group_by": [],
+      "filters": [],
+      "time": [],
+      "order_limit": [],
+      "aggregation_hint": null
+    },
+    "error": "Completions.create() got an unexpected keyword argument 'method'",
+    "seconds": 0.0
+  }
+]
