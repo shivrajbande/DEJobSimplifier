@@ -1,0 +1,482 @@
+[
+  {
+    "question_id": 58,
+    "db_id": "california_schools",
+    "question": "What is the phone number and extension number for the school with the zip code 95203-3704? Indicate the school's name.",
+    "evidence": "",
+    "SQL": "SELECT Phone, Ext, School FROM schools WHERE Zip = '95203-3704'",
+    "difficulty": "simple"
+  },
+  {
+    "question_id": 10,
+    "db_id": "california_schools",
+    "question": "For the school with the highest average score in Reading in the SAT test, what is its FRPM count for students aged 5-17?",
+    "evidence": "",
+    "SQL": "SELECT T2.`FRPM Count (Ages 5-17)` FROM satscores AS T1 INNER JOIN frpm AS T2 ON T1.cds = T2.CDSCode ORDER BY T1.AvgScrRead DESC LIMIT 1",
+    "difficulty": "simple"
+  },
+  {
+    "question_id": 42,
+    "db_id": "california_schools",
+    "question": "What is the type of education offered in the school who scored the highest average in Math?",
+    "evidence": "",
+    "SQL": "SELECT T2.EdOpsName FROM satscores AS T1 INNER JOIN schools AS T2 ON T1.cds = T2.CDSCode ORDER BY T1.AvgScrMath DESC LIMIT 1",
+    "difficulty": "simple"
+  },
+  {
+    "question_id": 1,
+    "db_id": "california_schools",
+    "question": "Please list the lowest three eligible free rates for students aged 5-17 in continuation schools.",
+    "evidence": "Eligible free rates for students aged 5-17 = `Free Meal Count (Ages 5-17)` / `Enrollment (Ages 5-17)`",
+    "SQL": "SELECT `Free Meal Count (Ages 5-17)` / `Enrollment (Ages 5-17)` FROM frpm WHERE `Educational Option Type` = 'Continuation School' AND `Free Meal Count (Ages 5-17)` / `Enrollment (Ages 5-17)` IS NOT NULL ORDER BY `Free Meal Count (Ages 5-17)` / `Enrollment (Ages 5-17)` ASC LIMIT 3",
+    "difficulty": "moderate"
+  },
+  {
+    "question_id": 71,
+    "db_id": "california_schools",
+    "question": "What is the district code for the School that does not offer a magnet program in the city of Fresno?",
+    "evidence": "When magent is equal to 0 in the database, it means ths school doesn't offer a magnet program.",
+    "SQL": "SELECT T1.`District Code` FROM frpm AS T1 INNER JOIN schools AS T2 ON T1.CDSCode = T2.CDSCode WHERE T2.City = 'Fresno' AND T2.Magnet = 0",
+    "difficulty": "simple"
+  },
+  {
+    "question_id": 66,
+    "db_id": "california_schools",
+    "question": "Between 1/1/2000 to 12/31/2005, how many directly funded schools opened in the county of Stanislaus?",
+    "evidence": "Directly funded schools refers to FundingType = 'Directly Funded'",
+    "SQL": "SELECT COUNT(School) FROM schools WHERE strftime('%Y', OpenDate) BETWEEN '2000' AND '2005' AND County = 'Stanislaus' AND FundingType = 'Directly funded'",
+    "difficulty": "simple"
+  },
+  {
+    "question_id": 15,
+    "db_id": "california_schools",
+    "question": "Which active district has the highest average score in Reading?",
+    "evidence": "",
+    "SQL": "SELECT T1.District FROM schools AS T1 INNER JOIN satscores AS T2 ON T1.CDSCode = T2.cds WHERE T1.StatusType = 'Active' ORDER BY T2.AvgScrRead DESC LIMIT 1",
+    "difficulty": "simple"
+  },
+  {
+    "question_id": 26,
+    "db_id": "california_schools",
+    "question": "State the names and full communication address of high schools in Monterey which has more than 800 free or reduced price meals for ages 15-17?",
+    "evidence": "Full communication address should include Street, City, State and zip code if any.",
+    "SQL": "SELECT T1.`School Name`, T2.Street, T2.City, T2.State, T2.Zip FROM frpm AS T1 INNER JOIN schools AS T2 ON T1.CDSCode = T2.CDSCode WHERE T2.County = 'Monterey' AND T1.`Free Meal Count (Ages 5-17)` > 800 AND T1.`School Type` = 'High Schools (Public)'",
+    "difficulty": "moderate"
+  },
+  {
+    "question_id": 40,
+    "db_id": "california_schools",
+    "question": "What is the telephone number for the school with the lowest average score in reading in Fresno Unified?",
+    "evidence": "Fresno Unified is a name of district;",
+    "SQL": "SELECT T2.Phone FROM satscores AS T1 INNER JOIN schools AS T2 ON T1.cds = T2.CDSCode WHERE T2.District = 'Fresno Unified' AND T1.AvgScrRead IS NOT NULL ORDER BY T1.AvgScrRead ASC LIMIT 1",
+    "difficulty": "moderate"
+  },
+  {
+    "question_id": 32,
+    "db_id": "california_schools",
+    "question": "What is the eligible free or reduced price meal rate for the top 5 schools in grades 1-12 with the highest free or reduced price meal count of the schools with the ownership code 66?",
+    "evidence": "grades 1-12 means K-12; Eligible free or reduced price meal rate for K-12 = `FRPM Count (K-12)` / `Enrollment (K-12)`",
+    "SQL": "SELECT CAST(T1.`FRPM Count (K-12)` AS REAL) / T1.`Enrollment (K-12)` FROM frpm AS T1 INNER JOIN schools AS T2 ON T1.CDSCode = T2.CDSCode WHERE T2.SOC = 66 ORDER BY T1.`FRPM Count (K-12)` DESC LIMIT 5",
+    "difficulty": "moderate"
+  },
+  {
+    "question_id": 45,
+    "db_id": "california_schools",
+    "question": "What is the average writing score of each of the schools managed by Ricci Ulrich? List the schools and the corresponding average writing scores.",
+    "evidence": "Usually, administrators manage the school stuff.",
+    "SQL": "SELECT T2.School, T1.AvgScrWrite FROM satscores AS T1 INNER JOIN schools AS T2 ON T1.cds = T2.CDSCode WHERE T2.AdmFName1 = 'Ricci' AND T2.AdmLName1 = 'Ulrich'",
+    "difficulty": "moderate"
+  },
+  {
+    "question_id": 47,
+    "db_id": "california_schools",
+    "question": "What is the monthly average number of schools that opened in Alameda County under the jurisdiction of the Elementary School District in 1980?",
+    "evidence": "Elementary School District refers to DOC = 52; Monthly average number of schools that opened in 1980 = count(schools that opened in 1980) / 12",
+    "SQL": "SELECT CAST(COUNT(School) AS REAL) / 12 FROM schools WHERE DOC = 52 AND County = 'Alameda' AND strftime('%Y', OpenDate) = '1980'",
+    "difficulty": "moderate"
+  },
+  {
+    "question_id": 67,
+    "db_id": "california_schools",
+    "question": "What is the total amount of Community College District closure in 1989 in the city of San Francisco?",
+    "evidence": "",
+    "SQL": "SELECT COUNT(School) FROM schools WHERE strftime('%Y', ClosedDate) = '1989' AND City = 'San Francisco' AND DOCType = 'Community College District'",
+    "difficulty": "simple"
+  },
+  {
+    "question_id": 19,
+    "db_id": "california_schools",
+    "question": "What is the phone number of the school that has the highest average score in Math?",
+    "evidence": "",
+    "SQL": "SELECT T1.Phone FROM schools AS T1 INNER JOIN satscores AS T2 ON T1.CDSCode = T2.cds ORDER BY T2.AvgScrMath DESC LIMIT 1",
+    "difficulty": "simple"
+  },
+  {
+    "question_id": 59,
+    "db_id": "california_schools",
+    "question": "What is the website for the schools under the administrations of Mike Larson and Dante Alvarez?",
+    "evidence": "",
+    "SQL": "SELECT Website FROM schools WHERE (AdmFName1 = 'Mike' AND AdmLName1 = 'Larson') OR (AdmFName1 = 'Dante' AND AdmLName1 = 'Alvarez')",
+    "difficulty": "simple"
+  },
+  {
+    "question_id": 125,
+    "db_id": "financial",
+    "question": "For loans contracts which are still running where client are in debt, list the district of the and the state the percentage unemployment rate increment from year 1995 to 1996.",
+    "evidence": "Unemployment increment rate in percentage = [(unemployment rate 2016 - unemployment rate 2015) / unemployment rate 2015] * 100; unemployment rate 2015 appears in the A12; unemployment rate 2016 appears in the A13; Loan contracts which are still running where client are in debt can be presented as status = 'D'",
+    "SQL": "SELECT CAST((T3.A13 - T3.A12) AS REAL) * 100 / T3.A12 FROM loan AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id INNER JOIN district AS T3 ON T2.district_id = T3.district_id WHERE T1.status = 'D'",
+    "difficulty": "challenging"
+  },
+  {
+    "question_id": 102,
+    "db_id": "financial",
+    "question": "State different accounts who have account opening date before 1997 and own an amount of money greater than 3000USD",
+    "evidence": "",
+    "SQL": "SELECT DISTINCT T2.account_id FROM trans AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id WHERE STRFTIME('%Y', T2.date) < '1997' AND T1.amount > 3000",
+    "difficulty": "simple"
+  },
+  {
+    "question_id": 146,
+    "db_id": "financial",
+    "question": "Who are the female account holders who own credit cards and also have loans?",
+    "evidence": "Female refers to gender = 'F'",
+    "SQL": "SELECT T1.client_id FROM client AS T1 INNER JOIN disp AS T2 ON T1.client_id = T2.client_id INNER JOIN account AS T5 ON T2.account_id = T5.account_id INNER JOIN loan AS T3 ON T5.account_id = T3.account_id INNER JOIN card AS T4 ON T2.disp_id = T4.disp_id WHERE T1.gender = 'F'",
+    "difficulty": "simple"
+  },
+  {
+    "question_id": 169,
+    "db_id": "financial",
+    "question": "What was the growth rate of the total amount of loans across all accounts for a male client between 1996 and 1997?",
+    "evidence": "Growth rate = (sum of amount_1997 - sum of amount_1996) / (sum of amount_1996) * 100%; Male refers to gender = 'M'",
+    "SQL": "SELECT CAST((SUM(CASE WHEN STRFTIME('%Y', T1.date) = '1997' THEN T1.amount ELSE 0 END) - SUM(CASE WHEN STRFTIME('%Y', T1.date) = '1996' THEN T1.amount ELSE 0 END)) AS REAL) * 100 / SUM(CASE WHEN STRFTIME('%Y', T1.date) = '1996' THEN T1.amount ELSE 0 END) FROM loan AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id INNER JOIN disp AS T3 ON T3.account_id = T2.account_id INNER JOIN client AS T4 ON T4.client_id = T3.client_id WHERE T4.gender = 'M' AND T3.type = 'OWNER'",
+    "difficulty": "challenging"
+  },
+  {
+    "question_id": 150,
+    "db_id": "financial",
+    "question": "How many accounts in North Bohemia has made a transaction with the partner's bank being AB?",
+    "evidence": "A3 contains the region names; North Bohemia is a region.",
+    "SQL": "SELECT COUNT(T2.account_id) FROM district AS T1 INNER JOIN account AS T2 ON T1.district_id = T2.district_id INNER JOIN trans AS T3 ON T2.account_id = T3.account_id WHERE T3.bank = 'AB' AND T1.A3 = 'north Bohemia'",
+    "difficulty": "moderate"
+  },
+  {
+    "question_id": 94,
+    "db_id": "financial",
+    "question": "List out the account numbers of female clients who are oldest and has lowest average salary, calculate the gap between this lowest average salary with the highest average salary?",
+    "evidence": "Female means gender = 'F'; A11 refers to average salary; Gap = highest average salary - lowest average salary; If the person A's birthdate > B's birthdate, it means that person B is order than person A.",
+    "SQL": "SELECT T1.account_id , ( SELECT MAX(A11) - MIN(A11) FROM district ) FROM account AS T1 INNER JOIN district AS T2 ON T1.district_id = T2.district_id INNER JOIN disp AS T3 ON T1.account_id = T3.account_id INNER JOIN client AS T4 ON T3.client_id = T4.client_id WHERE T2.district_id = ( SELECT district_id FROM client WHERE gender = 'F' ORDER BY birth_date ASC LIMIT 1 ) ORDER BY T2.A11 DESC LIMIT 1",
+    "difficulty": "challenging"
+  },
+  {
+    "question_id": 153,
+    "db_id": "financial",
+    "question": "How many 'classic' cards are eligible for loan?",
+    "evidence": "when the account type = 'OWNER', it's eligible for loan",
+    "SQL": "SELECT COUNT(T1.card_id) FROM card AS T1 INNER JOIN disp AS T2 ON T1.disp_id = T2.disp_id WHERE T1.type = 'classic' AND T2.type = 'OWNER'",
+    "difficulty": "simple"
+  },
+  {
+    "question_id": 119,
+    "db_id": "financial",
+    "question": "For accounts in 1993 with statement issued after transaction, list the account ID, district name and district region.",
+    "evidence": "Records about district names could be found in A2; A3 contains the information about regions. 'POPLATEK PO OBRATU' stands for issuance after transaction",
+    "SQL": "SELECT T1.account_id, T2.A2, T2.A3 FROM account AS T1 INNER JOIN district AS T2 ON T1.district_id = T2.district_id WHERE T1.frequency = 'POPLATEK PO OBRATU' AND STRFTIME('%Y', T1.date)= '1993'",
+    "difficulty": "moderate"
+  },
+  {
+    "question_id": 141,
+    "db_id": "financial",
+    "question": "Which districts have transactions greater than USS$10,000 in 1997?",
+    "evidence": "",
+    "SQL": "SELECT T1.district_id FROM account AS T1 INNER JOIN district AS T2 ON T1.district_id = T2.district_id INNER JOIN trans AS T3 ON T1.account_id = T3.account_id WHERE STRFTIME('%Y', T3.date) = '1997' GROUP BY T1.district_id HAVING SUM(T3.amount) > 10000",
+    "difficulty": "simple"
+  },
+  {
+    "question_id": 132,
+    "db_id": "financial",
+    "question": "What is the average loan amount by male borrowers?",
+    "evidence": "Male refers to gender = 'M'",
+    "SQL": "SELECT AVG(T4.amount) FROM client AS T1 INNER JOIN disp AS T2 ON T1.client_id = T2.client_id INNER JOIN account AS T3 ON T2.account_id = T3.account_id INNER JOIN loan AS T4 ON T3.account_id = T4.account_id WHERE T1.gender = 'M'",
+    "difficulty": "simple"
+  },
+  {
+    "question_id": 149,
+    "db_id": "financial",
+    "question": "Please list the account types that are not eligible for loans, and the average income of residents in the district where the account is located exceeds $8000 but is no more than $9000.",
+    "evidence": "A11 represents the average salary; Salary and income share the similar meanings; when the account type = 'OWNER', it's eligible for loans",
+    "SQL": "SELECT T3.type FROM district AS T1 INNER JOIN account AS T2 ON T1.district_id = T2.district_id INNER JOIN disp AS T3 ON T2.account_id = T3.account_id WHERE T3.type != 'OWNER' AND T1.A11 BETWEEN 8000 AND 9000",
+    "difficulty": "challenging"
+  },
+  {
+    "question_id": 168,
+    "db_id": "financial",
+    "question": "What percentage of clients who opened their accounts in the district with an average salary of over 10000 are women?",
+    "evidence": "Female refers to gender = 'F'; Woman and female are closed; Average salary can be found in A11",
+    "SQL": "SELECT CAST(SUM(T2.gender = 'F') AS REAL) * 100 / COUNT(T2.client_id) FROM district AS T1 INNER JOIN client AS T2 ON T1.district_id = T2.district_id WHERE T1.A11 > 10000",
+    "difficulty": "moderate"
+  },
+  {
+    "question_id": 159,
+    "db_id": "financial",
+    "question": "List all the withdrawals in cash transactions that the client with the id 3356 makes.",
+    "evidence": "operation = 'VYBER' refers to withdrawal in cash",
+    "SQL": "SELECT T4.trans_id FROM client AS T1 INNER JOIN disp AS T2 ON T1.client_id = T2.client_id INNER JOIN account AS T3 ON T2.account_id = T3.account_id INNER JOIN trans AS T4 ON T3.account_id = T4.account_id WHERE T1.client_id = 3356 AND T4.operation = 'VYBER'",
+    "difficulty": "simple"
+  },
+  {
+    "question_id": 111,
+    "db_id": "financial",
+    "question": "How many accounts were opened in Litomerice in 1996?",
+    "evidence": "A2 refers to district name; Litomerice is one of district names.",
+    "SQL": "SELECT COUNT(T2.account_id) FROM district AS T1 INNER JOIN account AS T2 ON T1.district_id = T2.district_id WHERE STRFTIME('%Y', T2.date) = '1996' AND T1.A2 = 'Litomerice'",
+    "difficulty": "simple"
+  },
+  {
+    "question_id": 126,
+    "db_id": "financial",
+    "question": "Calculate the percentage of account from 'Decin' district for all accounts are opened in 1993.",
+    "evidence": "A2 contains the information about district.",
+    "SQL": "SELECT CAST(SUM(T1.A2 = 'Decin') AS REAL) * 100 / COUNT(account_id) FROM district AS T1 INNER JOIN account AS T2 ON T1.district_id = T2.district_id WHERE STRFTIME('%Y', T2.date) = '1993'",
+    "difficulty": "simple"
+  },
+  {
+    "question_id": 660,
+    "db_id": "codebase_community",
+    "question": "What is the owner user id of the most valuable post?",
+    "evidence": "the most valuable post refers to MAX(FavoriteCount);",
+    "SQL": "SELECT OwnerUserId FROM posts WHERE FavoriteCount = ( SELECT MAX(FavoriteCount) FROM posts )",
+    "difficulty": "simple"
+  },
+  {
+    "question_id": 613,
+    "db_id": "codebase_community",
+    "question": "List out the dates that users who are located in Rochester, NY obtained their badges?",
+    "evidence": "\"Rochester, NY\" is the Location of user; user refers to UserId",
+    "SQL": "SELECT T2.Date FROM users AS T1 INNER JOIN badges AS T2 ON T1.Id = T2.UserId WHERE T1.Location = 'Rochester, NY'",
+    "difficulty": "simple"
+  },
+  {
+    "question_id": 631,
+    "db_id": "codebase_community",
+    "question": "How many posts were created by Daniel Vassallo?",
+    "evidence": "DisplayName = 'Daniel Vassallo';",
+    "SQL": "SELECT COUNT(T1.Id) FROM users AS T1 INNER JOIN postHistory AS T2 ON T1.Id = T2.UserId WHERE T1.DisplayName = 'Daniel Vassallo'",
+    "difficulty": "simple"
+  },
+  {
+    "question_id": 565,
+    "db_id": "codebase_community",
+    "question": "User No.23853 gave a comment to a post at 9:08:18 on 2013/7/12, was that post well-finished?",
+    "evidence": "user no. 23853 refers to UserId = '23853'; at 9:08:18 on 2013/7/12 refers to CreationDate = '2013-07-12 09:08:18.0'; not well-finished refers to ClosedDate IS NULL and vice versa",
+    "SQL": "SELECT IIF(T2.ClosedDate IS NULL, 'NOT well-finished', 'well-finished') AS resylt FROM comments AS T1 INNER JOIN posts AS T2 ON T1.PostId = T2.Id WHERE T1.UserId = 23853 AND T1.CreationDate = '2013-07-12 09:08:18.0'",
+    "difficulty": "moderate"
+  },
+  {
+    "question_id": 690,
+    "db_id": "codebase_community",
+    "question": "Identify the latest badge awarded to the user with the display name Emmett.",
+    "evidence": "the latest badge refers to Name FROM badges where MAX(Date);",
+    "SQL": "SELECT T1.Name FROM badges AS T1 INNER JOIN users AS T2 ON T1.UserId = T2.Id WHERE T2.DisplayName = 'Emmett' ORDER BY T1.Date DESC LIMIT 1",
+    "difficulty": "simple"
+  },
+  {
+    "question_id": 711,
+    "db_id": "codebase_community",
+    "question": "Among products comments with 0 score, what is the total number of users ages 40 years old?",
+    "evidence": "",
+    "SQL": "SELECT COUNT(DISTINCT T1.id) FROM comments AS T1 INNER JOIN users AS T2 ON T1.UserId = T2.Id WHERE T1.Score = 0 AND T2.Age = 40",
+    "difficulty": "simple"
+  },
+  {
+    "question_id": 694,
+    "db_id": "codebase_community",
+    "question": "Provide the text of the latest 10 comments to the post with the title 'Analysing wind data with R' and the display name of the user who left it.",
+    "evidence": "the latest comment refers to MAX(CreationDate);",
+    "SQL": "SELECT T3.Text, T1.DisplayName FROM users AS T1 INNER JOIN posts AS T2 ON T1.Id = T2.OwnerUserId INNER JOIN comments AS T3 ON T2.Id = T3.PostId WHERE T2.Title = 'Analysing wind data with R' ORDER BY T1.CreationDate DESC LIMIT 10",
+    "difficulty": "moderate"
+  },
+  {
+    "question_id": 648,
+    "db_id": "codebase_community",
+    "question": "Provide the users' display names and available website URLs of the post with favorite count of more than 150.",
+    "evidence": "favorite count of more than 150 refers to FavoriteCount > 150;",
+    "SQL": "SELECT T1.DisplayName, T1.WebsiteUrl FROM users AS T1 INNER JOIN posts AS T2 ON T1.Id = T2.OwnerUserId WHERE T2.FavoriteCount > 150",
+    "difficulty": "simple"
+  },
+  {
+    "question_id": 563,
+    "db_id": "codebase_community",
+    "question": "User No.3025 gave a comment at 20:29:39 on 2014/4/23 to a post, how many favorite counts did that post get?",
+    "evidence": "user no. 3025 refers to UserId = '3025'; comment at 20:29:39 on 2014/4/23 refers to CreationDate = '2014/4/23 20:29:39.0'",
+    "SQL": "SELECT T1.FavoriteCount FROM posts AS T1 INNER JOIN comments AS T2 ON T1.Id = T2.PostId WHERE T2.CreationDate = '2014-04-23 20:29:39.0' AND T2.UserId = 3025",
+    "difficulty": "moderate"
+  },
+  {
+    "question_id": 574,
+    "db_id": "codebase_community",
+    "question": "Which user has the website URL listed at 'http://stackoverflow.com'",
+    "evidence": "\"http://stackoverflow.com\" is the WebsiteUrl; user refers to DisplayName",
+    "SQL": "SELECT DisplayName FROM users WHERE WebsiteUrl = 'http://stackoverflow.com'",
+    "difficulty": "simple"
+  },
+  {
+    "question_id": 575,
+    "db_id": "codebase_community",
+    "question": "What is the badge name that user 'SilentGhost' obtained?",
+    "evidence": "\"SilentGhost\" is the DisplayName of user;",
+    "SQL": "SELECT T2.Name FROM users AS T1 INNER JOIN badges AS T2 ON T1.Id = T2.UserId WHERE T1.DisplayName = 'SilentGhost'",
+    "difficulty": "simple"
+  },
+  {
+    "question_id": 716,
+    "db_id": "codebase_community",
+    "question": "Among the comments with scores between 5 to 10, what is the percentage of the users with 0 up votes?",
+    "evidence": "percentage = DIVIDE(COUNT(UserId where UpVotes = 0 and Score BETWEEN 5 and 10))*100, (COUNT(UserId where Score BETWEEN 5 and 10));",
+    "SQL": "SELECT CAST(SUM(IIF(T1.UpVotes = 0, 1, 0)) AS REAL) * 100/ COUNT(T1.Id) AS per FROM users AS T1 INNER JOIN comments AS T2 ON T1.Id = T2.UserId WHERE T2.Score BETWEEN 5 AND 10",
+    "difficulty": "moderate"
+  },
+  {
+    "question_id": 597,
+    "db_id": "codebase_community",
+    "question": "How many users from India have the teacher badges?",
+    "evidence": "\"India\" is the Location; \"Teacher\" is the Name of badge",
+    "SQL": "SELECT COUNT(T1.Id) FROM badges AS T1 INNER JOIN users AS T2 ON T1.UserId = T2.Id WHERE T2.Location = 'India' AND T1.Name = 'Teacher'",
+    "difficulty": "simple"
+  },
+  {
+    "question_id": 616,
+    "db_id": "codebase_community",
+    "question": "What is the comment's rating score of the post which was created on 7/19/2010 7:19:56 PM",
+    "evidence": "created on 7/19/2010 7:19:56 PM refers to CreationDate = '2010-07-19 19:19:56.0'",
+    "SQL": "SELECT T1.Score FROM comments AS T1 INNER JOIN posts AS T2 ON T1.PostId = T2.Id WHERE T1.CreationDate = '2010-07-19 19:19:56.0'",
+    "difficulty": "simple"
+  },
+  {
+    "question_id": 553,
+    "db_id": "codebase_community",
+    "question": "Among the badges obtained by csgillespie, how many of them were obtained in the year 2011?",
+    "evidence": "\"csgillespie\" is the DisplayName of user; obtained in 2011 refers to YEAR (Date) = 2011",
+    "SQL": "SELECT COUNT(T1.Id) FROM badges AS T1 INNER JOIN users AS T2 ON T1.UserId = T2.Id WHERE STRFTIME('%Y', T1.Date) = '2011' AND T2.DisplayName = 'csgillespie'",
+    "difficulty": "simple"
+  },
+  {
+    "question_id": 1221,
+    "db_id": "thrombosis_prediction",
+    "question": "Provide the ID, sex, birthday of all patients diagnosed with 'RA' that are within the UN normal index.",
+    "evidence": "within the UN normal index refers to UN < 30; Diagnosis = 'RA'",
+    "SQL": "SELECT DISTINCT T1.ID, T1.SEX, T1.Birthday FROM Patient AS T1 INNER JOIN Laboratory AS T2 ON T1.ID = T2.ID WHERE T2.UN < 30 AND T1.Diagnosis = 'RA'",
+    "difficulty": "simple"
+  },
+  {
+    "question_id": 1311,
+    "db_id": "thrombosis_prediction",
+    "question": "How many patients with severe thrombosis have a normal prothrombin time?",
+    "evidence": "severe thrombosis refers to Thrombosis = 2 or 1; normal prothrombin time refers to PT < 14;",
+    "SQL": "SELECT COUNT(T1.ID) FROM Patient AS T1 INNER JOIN Laboratory AS T2 ON T1.ID = T2.ID INNER JOIN Examination AS T3 ON T1.ID = T3.ID WHERE T2.PT < 14 AND T3.Thrombosis < 3 AND T3.Thrombosis > 0",
+    "difficulty": "moderate"
+  },
+  {
+    "question_id": 1203,
+    "db_id": "thrombosis_prediction",
+    "question": "How many patients who were female got white blood cells that were below 3.5?",
+    "evidence": "female refers to SEX = 'F'; white blood cells that were below 3.5 refers to WBC < 3.5",
+    "SQL": "SELECT COUNT(T1.ID) FROM Patient AS T1 INNER JOIN Laboratory AS T2 ON T1.ID = T2.ID WHERE T2.WBC < 3.5 AND T1.SEX = 'F'",
+    "difficulty": "simple"
+  },
+  {
+    "question_id": 1199,
+    "db_id": "thrombosis_prediction",
+    "question": "How many patients who underwent testing in 1997 had protein levels outside the normal range?",
+    "evidence": "underwent testing in 1997 refers to YEAR(DATE) = '1997'; protein levels within the normal range refers to tp > 6 and tp < 8.5",
+    "SQL": "SELECT COUNT(ID) FROM Laboratory WHERE (ALB <= 6.0 OR ALB >= 8.5) AND STRFTIME('%Y', Date) = '1997'",
+    "difficulty": "simple"
+  },
+  {
+    "question_id": 1150,
+    "db_id": "thrombosis_prediction",
+    "question": "What is the percentage of female patient were born after 1930?",
+    "evidence": "female refers to Sex = 'F'; patient who were born after 1930 refers to year(Birthday) > '1930'; calculation = DIVIDE(COUNT(ID) where year(Birthday) > '1930' and SEX = 'F'), (COUNT(ID) where SEX = 'F')",
+    "SQL": "SELECT CAST(SUM(CASE WHEN STRFTIME('%Y', Birthday) > '1930' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(*) FROM Patient WHERE SEX = 'F'",
+    "difficulty": "moderate"
+  },
+  {
+    "question_id": 1281,
+    "db_id": "thrombosis_prediction",
+    "question": "Among the patients who have an abnormal level of glutamic oxaloacetic transaminase, when was the youngest of them born?",
+    "evidence": "abnormal level of glutamic oxaloacetic transaminase refers to GOT > = 60; The larger the birthday value, the younger the person is, and vice versa;",
+    "SQL": "SELECT T1.Birthday FROM Patient AS T1 INNER JOIN Laboratory AS T2 ON T1.ID = T2.ID WHERE T2.GOT >= 60 ORDER BY T1.Birthday DESC LIMIT 1",
+    "difficulty": "moderate"
+  },
+  {
+    "question_id": 1245,
+    "db_id": "thrombosis_prediction",
+    "question": "For the examinations done after 1997/1/1, how many of them have the result of an inactivated partial prothrom bin time?",
+    "evidence": "examinations done after 1997/1/1 refers to `Examination Date` > '1997-01-01'; normal activated partial prothrom bin time refesr to APTT < 45;",
+    "SQL": "SELECT COUNT(T1.ID) FROM Patient AS T1 INNER JOIN Laboratory AS T2 ON T1.ID = T2.ID WHERE T2.Date > '1997-01-01' AND T2.APTT >= 45",
+    "difficulty": "moderate"
+  },
+  {
+    "question_id": 1229,
+    "db_id": "thrombosis_prediction",
+    "question": "For all patients with triglyceride (TG) level beyond the normal range, how many are age more than 50 years?",
+    "evidence": "triglyceride (TG) level beyond the normal range refers to TG > = 200; more than 50 years of age = SUBTRACT(year(current_timestamp), year(Birthday)) > 50; Should consider DISTINCT in the final result;",
+    "SQL": "SELECT COUNT(DISTINCT T1.ID) FROM Patient AS T1 INNER JOIN Laboratory AS T2 ON T1.ID = T2.ID WHERE T2.TG >= 200 AND STRFTIME('%Y', CURRENT_TIMESTAMP) - STRFTIME('%Y', T1.Birthday) > 50",
+    "difficulty": "moderate"
+  },
+  {
+    "question_id": 1211,
+    "db_id": "thrombosis_prediction",
+    "question": "Provide the ID and age of patient with lactate dehydrogenase (LDH) between 100-300 index above the normal range.",
+    "evidence": "age refers to SUBTRACT(year(current_timestamp), year(Birthday)); lactate dehydrogenase (LDH) between 100-300 index above the normal range refers to LDH between 600 and 800;",
+    "SQL": "SELECT DISTINCT T1.ID, STRFTIME('%Y', CURRENT_TIMESTAMP) - STRFTIME('%Y', T1.Birthday) FROM Patient AS T1 INNER JOIN Laboratory AS T2 ON T1.ID = T2.ID WHERE T2.LDH > 600 AND T2.LDH < 800",
+    "difficulty": "moderate"
+  },
+  {
+    "question_id": 1305,
+    "db_id": "thrombosis_prediction",
+    "question": "How many patients accepted to the hospital have a normal level of white blood cells?",
+    "evidence": "accepted to the hospital refers to Admission = '+'; normal level of white blood cells refers to WBC between 3.5 and 9.0;",
+    "SQL": "SELECT COUNT(T1.ID) FROM Patient AS T1 INNER JOIN Laboratory AS T2 ON T1.ID = T2.ID WHERE T2.WBC BETWEEN 3.5 AND 9 AND T1.Admission = '+'",
+    "difficulty": "moderate"
+  },
+  {
+    "question_id": 1304,
+    "db_id": "thrombosis_prediction",
+    "question": "Among the patients with a normal blood glucose, how many of them don't have thrombosis?",
+    "evidence": "normal blood glucose refers to GLU < 180; don't have thrombosis refers to Thrombosis = 0;",
+    "SQL": "SELECT COUNT(T1.ID) FROM Patient AS T1 INNER JOIN Laboratory AS T2 ON T1.ID = T2.ID INNER JOIN Examination AS T3 ON T1.ID = T3.ID WHERE T2.GLU < 180 AND T3.Thrombosis = 0",
+    "difficulty": "moderate"
+  },
+  {
+    "question_id": 1164,
+    "db_id": "thrombosis_prediction",
+    "question": "How many of the patients with the most serious thrombosis cases examined in 1997 are women?",
+    "evidence": "the most serious thrombosis refers to Thrombosis = '1' (the most severe one); women refers to sex = 'F'",
+    "SQL": "SELECT  COUNT(*) FROM Patient AS T1 INNER JOIN Examination AS T2 ON T1.ID = T2.ID WHERE T1.SEX = 'F' AND STRFTIME('%Y', T2.`Examination Date`) = '1997' AND T2.Thrombosis = 1",
+    "difficulty": "moderate"
+  },
+  {
+    "question_id": 1236,
+    "db_id": "thrombosis_prediction",
+    "question": "For all the female patient age 50 and above, who has abnormal red blood cell count. State if they were admitted to hospital.",
+    "evidence": "female patient refers to Sex = 'F'; age 50 and above = SUBTRACT(year(current_timestamp), year(Birthday)) > = 50; abnormal red blood cell count refers to RBC < = 3.5 or RBC > = 6.0; Admission = '+' means the patient was admitted to the hospital; Admission = '-' means the patient was not admitted to the hospital;",
+    "SQL": "SELECT DISTINCT T1.ID, T1.Admission FROM Patient AS T1 INNER JOIN Laboratory AS T2 ON T1.ID = T2.ID WHERE T1.SEX = 'F' AND (T2.RBC <= 3.5 OR T2.RBC >= 6.0) AND STRFTIME('%Y', CURRENT_TIMESTAMP) - STRFTIME('%Y', T1.Birthday) >= 50",
+    "difficulty": "challenging"
+  },
+  {
+    "question_id": 1222,
+    "db_id": "thrombosis_prediction",
+    "question": "How many male patients are are with creatinine index out of the normal range?",
+    "evidence": "creatinine (CRE) out of the normal range refers to CRE > = 1.5; Male refers to Sex = 'M'",
+    "SQL": "SELECT COUNT(T1.ID) FROM Patient AS T1 INNER JOIN Laboratory AS T2 ON T1.ID = T2.ID WHERE T2.CRE >= 1.5 AND T1.SEX = 'M'",
+    "difficulty": "simple"
+  },
+  {
+    "question_id": 1237,
+    "db_id": "thrombosis_prediction",
+    "question": "Among all outpatients, list out those have low hemoglobin level. State the different IDs and their sex.",
+    "evidence": "outpatients refers to Admission = '-'; low hemoglobin level refers to HBG < 10;",
+    "SQL": "SELECT DISTINCT T1.ID, T1.SEX FROM Patient AS T1 INNER JOIN Laboratory AS T2 ON T1.ID = T2.ID WHERE T2.HGB < 10 AND T1.Admission = '-'",
+    "difficulty": "simple"
+  }
+]
